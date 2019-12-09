@@ -14,7 +14,9 @@ module.exports = {
     semi: ['error', 'always'],
     'vue/script-indent': ['error', 2, {
       baseIndent: 1
-    }]
+    }],
+    'comma-dangle': ['error', 'always-multiline'],
+    'object-curly-spacing': ['error', 'never'],
   },
   parserOptions: {
     parser: '@typescript-eslint/parser'
