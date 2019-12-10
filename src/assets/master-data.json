@@ -1,109 +1,177 @@
 {
-  "items": [
-    {
-      "name": "双酮"
-    },
-    {
-      "name": "酮凝集"
-    },
-    {
-      "name": "酮凝集组"
-    },
-    {
-      "name": "酮阵列"
-    },
-    {
-      "name": "异铁碎片"
-    },
-    {
-      "name": "异铁"
-    },
-    {
-      "name": "异铁组"
-    },
-    {
-      "name": "异铁块"
-    },
-    {
-      "name": "代糖"
-    },
-    {
-      "name": "糖"
-    },
-    {
-      "name": "糖组"
-    },
-    {
-      "name": "糖聚块"
-    },
-    {
-      "name": "酯原料"
-    },
-    {
-      "name": "聚酸酯"
-    },
-    {
-      "name": "聚酸酯组"
-    },
-    {
-      "name": "聚酸酯块"
-    },
-    {
-      "name": "破损装置"
-    },
-    {
-      "name": "装置"
-    },
-    {
-      "name": "全新装置"
-    },
-    {
-      "name": "改量装置"
-    },
-    {
-      "name": "源岩"
-    },
-    {
-      "name": "固源岩"
-    },
-    {
-      "name": "固源岩组"
-    },
-    {
-      "name": "提纯源岩"
-    },
-    {
-      "name": "RMA70-12"
-    },
-    {
-      "name": "RMA70-24"
-    },
-    {
-      "name": "研磨石"
-    },
-    {
-      "name": "五水研磨石"
-    },
-    {
-      "name": "轻锰矿"
-    },
-    {
-      "name": "三水锰矿"
-    },
-    {
-      "name": "扭转醇"
-    },
-    {
-      "name": "白马醇"
-    },
-    {
-      "name": "聚合剂"
-    },
-    {
-      "name": "双极纳米片"
-    },
-    {
-      "name": "D32钢"
+  "agents": {
+    "能天使": {
+      "name": "能天使",
+      "nameEN": "Exusiai",
+      "category": "狙击干员",
+      "stars": 6,
+      "promoteItems": {
+        "level1": [
+          {
+            "item": "龙门币",
+            "amount": 30000
+          },
+          {
+            "item": "狙击芯片",
+            "amount": 5
+          },
+          {
+            "item": "固源岩",
+            "amount": 12
+          },
+          {
+            "item": "酮凝集",
+            "amount": 4
+          }
+        ],
+        "level2": [
+          {
+            "item": "龙门币",
+            "amount": 180000
+          },
+          {
+            "item": "狙击双芯片",
+            "amount": 4
+          },
+          {
+            "item": "聚合剂",
+            "amount": 4
+          },
+          {
+            "item": "糖聚块",
+            "amount": 5
+          }
+        ]
+      },
+      "skillLevelUpItems": {
+        "level2": [
+          {
+            "item": "技巧概要·卷1",
+            "amount": 5
+          }
+        ],
+        "level3": [
+          {
+            "item": "技巧概要·卷1",
+            "amount": 5
+          },
+          {
+            "item": "源岩",
+            "amount": 6
+          },
+          {
+            "item": "破损装置",
+            "amount": 4
+          }
+        ],
+        "level4": [
+          {
+            "item": "技巧概要·卷2",
+            "amount": 8
+          },
+          {
+            "item": "糖",
+            "amount": 5
+          }
+        ],
+        "level5": [
+          {
+            "item": "技巧概要·卷2",
+            "amount": 8
+          },
+          {
+            "item": "聚酸酯",
+            "amount": 4
+          },
+          {
+            "item": "异铁",
+            "amount": 4
+          }
+        ],
+        "level6": [
+          {
+            "item": "技巧概要·卷2",
+            "amount": 8
+          },
+          {
+            "item": "异铁组",
+            "amount": 6
+          }
+        ],
+        "level7": [
+          {
+            "item": "技巧概要·卷3",
+            "amount": 8
+          },
+          {
+            "item": "酮凝集组",
+            "amount": 3
+          },
+          {
+            "item": "扭转醇",
+            "amount": 6
+          }
+        ]
+      },
+      "skillSpecializeItems": [
+        {
+          "skillName": "冲锋模式",
+          "rank1": [],
+          "rank2": [],
+          "rank3": []
+        },
+        {
+          "skillName": "扫射模式",
+          "rank1": [],
+          "rank2": [],
+          "rank3": []
+        },
+        {
+          "skillName": "过载模式",
+          "rank1": [
+            {
+              "item": "技巧概要·卷3",
+              "amount": 6
+            },
+            {
+              "item": "改量装置",
+              "amount": 3
+            },
+            {
+              "item": "异铁组",
+              "amount": 4
+            }
+          ],
+          "rank2": [
+            {
+              "item": "技巧概要·卷3",
+              "amount": 12
+            },
+            {
+              "item": "五水研磨石",
+              "amount": 4
+            },
+            {
+              "item": "白马醇",
+              "amount": 9
+            }
+          ],
+          "rank3": [
+            {
+              "item": "技巧概要·卷3",
+              "amount": 15
+            },
+            {
+              "item": "聚合剂",
+              "amount": 6
+            },
+            {
+              "item": "糖聚块",
+              "amount": 6
+            }
+          ]
+        }
+      ]
     }
-  ]
+  }
 }

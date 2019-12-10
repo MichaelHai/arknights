@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row dense>
-      <v-col v-for="item in items" :key="item" cols="6">
+      <v-col v-for="item in AllItems" :key="item" cols="6">
         <v-row dense>
           <v-col cols="4">
             <v-img :alt="item" :src="require(`@/assets/items/${item}.png`)"/>
@@ -27,32 +27,34 @@
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import MasterData from '@/assets/master-data.json';
   import {Mutations} from '@/store';
+  import {AllItems, Item} from '@/model';
 
   @Component
   export default class Warehouse extends Vue {
-    protected items: Array<string> = MasterData.items.map((item) => item.name);
+    protected get AllItems(): Array<Item> {
+      return AllItems;
+    }
 
-    protected get itemCounts(): { [item: string]: number } {
+    protected get itemCounts(): { [item in Item]: number } {
       return this.$store.state.itemCounts;
     }
 
-    protected increaseItem(item: string): void {
+    protected increaseItem(item: Item): void {
       this.changeItem(item, 1);
     }
 
-    protected itemCountChanged(item: string, amount: number): void {
+    protected itemCountChanged(item: Item, amount: number): void {
       this.$nextTick(() => {
         this.$store.commit(Mutations.SetItemCount, {item, amount});
       });
     }
 
-    protected decreaseItem(item: string): void {
+    protected decreaseItem(item: Item): void {
       this.changeItem(item, -1);
     }
 
-    private changeItem(item: string, amount: number) {
+    private changeItem(item: Item, amount: number) {
       return this.$store.commit(Mutations.ChangeItem, {
         item,
         amount,
