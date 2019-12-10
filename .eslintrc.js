@@ -17,6 +17,7 @@ module.exports = {
     }],
     'comma-dangle': ['error', 'always-multiline'],
     'object-curly-spacing': ['error', 'never'],
+    'space-before-function-paren': ['error', 'never'],
   },
   parserOptions: {
     parser: '@typescript-eslint/parser'
