@@ -13,7 +13,9 @@
         <v-card-text class="targetPanel">
           <v-expansion-panels>
             <v-expansion-panel>
-              <v-expansion-panel-header>目标练度</v-expansion-panel-header>
+              <v-expansion-panel-header>
+                目标练度<span><v-icon color="success" dense v-if="targetAchieved">mdi-check-circle</v-icon></span>
+              </v-expansion-panel-header>
               <v-expansion-panel-content>
                 <v-row dense>
                   <v-col cols="4" offset="4">
@@ -139,7 +141,7 @@
 
         <v-card-title class="subtitle">技能专精</v-card-title>
         <template v-for="(skill, index) in agentDetail.skillSpecializeItems">
-          <template v-if="agentData.skillSpecialize[index] !== agentData.planned.skillSpecialize[index]">
+          <template v-if="agentData.skillSpecialize[index] !== 3">
             <v-card-subtitle :key="`${skill.skillName}_title`" class="subtitle">
               <v-row>
                 <v-col cols="2">
@@ -190,6 +192,7 @@
   import ItemAmountList from '@/components/ItemAmountList.vue';
   import {AgentData, Getters, Mutations} from '@/store';
   import NumberInput from '@/components/NumberInput.vue';
+  import _ from 'lodash';
 
   @Component({
     components: {NumberInput, ItemAmountList},
@@ -205,6 +208,16 @@
 
     private get agentData(): AgentData {
       return this.$store.getters[Getters.AgentData](this.agent);
+    }
+
+    protected get targetAchieved(): boolean {
+      const current = {
+        level: this.agentData.level,
+        promote: this.agentData.promote,
+        skillLevel: this.agentData.skillLevel,
+        skillSpecialize: this.agentData.skillSpecialize,
+      };
+      return _.isEqual(current, this.agentData.planned);
     }
 
     protected rotatePlannedPromote() {
