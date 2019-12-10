@@ -14,6 +14,7 @@ const vuexPersist = new VuexPersist({
 export interface ArknightsState {
   itemCounts: { [item in Item]?: number };
   agentData: { [agent in Agent]?: AgentData };
+  homeAgent: Agent | null;
 }
 
 export interface AgentData {
@@ -32,6 +33,7 @@ export enum Mutations {
   ChangeItem = 'ChangeItem',
   SetItemCount = 'SetItemCount',
   SetAgentData = 'SetAgentData',
+  SetHomeAgent = 'SetHomeAgent',
 }
 
 export enum Getters {
@@ -52,6 +54,7 @@ const options: StoreOptions<ArknightsState> = {
   state: {
     itemCounts: {},
     agentData: {},
+    homeAgent: null,
   },
   getters: {
     [Getters.AgentData]: (state) => (agent: Agent) => {
@@ -94,6 +97,9 @@ const options: StoreOptions<ArknightsState> = {
     },
     [Mutations.SetAgentData]: (state: ArknightsState, payload: SetAgentPayload) => {
       Vue.set(state.agentData, payload.agent, payload.agentData);
+    },
+    [Mutations.SetHomeAgent]: (state: ArknightsState, homeAgent: Agent) => {
+      state.homeAgent = homeAgent;
     },
   },
   actions: {},

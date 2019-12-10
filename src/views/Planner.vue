@@ -43,7 +43,7 @@
           </v-row>
         </v-list-item-content>
 
-        <v-list-item-action @click="homeClicked(agent)">
+        <v-list-item-action @click.prevent.stop="homeClicked(agent)">
           <v-icon
             v-if="agent === homeAgent"
             color="yellow"
@@ -60,70 +60,8 @@
       </v-list-item>
     </v-list>
 
-    <v-bottom-sheet v-model="isBottomSheetShow" scrollable="true">
-      <v-card v-if="agentToShowInBottomSheet !== null">
-        <v-img
-          :src="require(`@/assets/agents/${agentToShowInBottomSheet}/background.png`)"
-          class="black--text align-end"
-          height="200px"
-        >
-          <v-card-title>{{ agentToShowInBottomSheet }}</v-card-title>
-        </v-img>
-
-        <v-card-text class="outerContainer">
-          <v-card elevation="0">
-            <v-card-title class="subtitle">精英化等级</v-card-title>
-            <v-card-text>
-              <item-amount-list
-                v-if="getAgentDetail(agentToShowInBottomSheet).promoteItems.level1"
-                :items="getAgentDetail(agentToShowInBottomSheet).promoteItems.level1"
-                title="精英化1"
-              />
-              <item-amount-list
-                v-if="getAgentDetail(agentToShowInBottomSheet).promoteItems.level2"
-                :items="getAgentDetail(agentToShowInBottomSheet).promoteItems.level2"
-                title="精英化2"
-              />
-            </v-card-text>
-
-            <v-divider/>
-
-            <v-card-title class="subtitle">技能等级</v-card-title>
-            <v-card-text>
-              <item-amount-list
-                v-for="(items, index) in getAgentDetail(agentToShowInBottomSheet).skillLevelUpItems"
-                :key="index"
-                :items="items"
-                :title="`${index}`"
-              />
-            </v-card-text>
-
-            <v-divider/>
-
-            <v-card-title class="subtitle">技能专精</v-card-title>
-            <template v-for="skill in getAgentDetail(agentToShowInBottomSheet).skillSpecializeItems">
-              <v-card-subtitle class="subtitle" :key="`${skill.skillName}_title`">{{ skill.skillName }}
-              </v-card-subtitle>
-              <v-card-text :key="skill.skillName">
-                <item-amount-list
-                  :items="skill.rank1"
-                  title="Rank1"
-                />
-                <item-amount-list
-                  :items="skill.rank2"
-                  title="Rank2"
-                />
-                <item-amount-list
-                  :items="skill.rank3"
-                  title="Rank3"
-                />
-              </v-card-text>
-
-              <v-divider inset :key="`${skill.skillName}_divider`"/>
-            </template>
-          </v-card>
-        </v-card-text>
-      </v-card>
+    <v-bottom-sheet v-model="isBottomSheetShow" :scrollable="true">
+      <agent-detail-card :agent="agentToShowInBottomSheet"/>
     </v-bottom-sheet>
   </div>
 </template>
@@ -132,14 +70,13 @@
   import {Component, Vue} from 'vue-property-decorator';
   import {Agent, AgentDetail, AllAgents} from '@/model';
   import MasterData from '@/assets/master-data.json';
-  import {AgentData, Getters} from '@/store';
-  import ItemAmountList from '@/components/ItemAmountList.vue';
+  import {AgentData, Getters, Mutations} from '@/store';
+  import AgentDetailCard from '@/components/AgentDetailCard.vue';
 
   @Component({
-    components: {ItemAmountList},
+    components: {AgentDetailCard},
   })
   export default class Planner extends Vue {
-    private homeAgent: Agent | null = null;
     private agentDetail: { [agent in Agent]: AgentDetail } = MasterData.agents;
     private isBottomSheetShow: boolean = false;
     private agentToShowInBottomSheet: Agent | null = null;
@@ -158,6 +95,14 @@
       } else {
         this.homeAgent = agent;
       }
+    }
+
+    private set homeAgent(agent: Agent | null) {
+      this.$store.commit(Mutations.SetHomeAgent, agent);
+    }
+
+    private get homeAgent(): Agent | null {
+      return this.$store.state.homeAgent;
     }
 
     protected getAgentDetail(agent: Agent): AgentDetail {
@@ -185,17 +130,5 @@
   .promoteIcon {
     display: inline-block;
     vertical-align: middle;
-  }
-
-  .skillLevel {
-    margin: auto;
-  }
-
-  .subtitle {
-    padding-bottom: 8px !important;
-  }
-
-  .outerContainer {
-    padding: 0 !important;
   }
 </style>
