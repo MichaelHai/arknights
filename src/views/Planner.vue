@@ -6,8 +6,10 @@
         :key="agent"
         @click="agentClicked(agent)"
       >
-        <v-list-item-avatar class="avatar">
-          <v-img :src="require(`@/assets/agents/${agent}/avatar.png`)"/>
+        <v-list-item-avatar class="avatar" tile>
+          <v-img :src="require(`@/assets/agents/${agent}/avatar.png`)">
+            <v-icon class="avatarCheck" color="success" v-if="targetAchieved(agent)">mdi-check-circle</v-icon>
+          </v-img>
         </v-list-item-avatar>
 
         <v-list-item-content>
@@ -72,6 +74,7 @@
   import MasterData from '@/assets/master-data.json';
   import {AgentData, Getters, Mutations} from '@/store';
   import AgentDetailCard from '@/components/AgentDetailCard.vue';
+  import {targetAchieved} from '@/model/Utils';
 
   @Component({
     components: {AgentDetailCard},
@@ -83,6 +86,10 @@
 
     private agentData(agent: Agent): AgentData {
       return this.$store.getters[Getters.AgentData](agent);
+    }
+
+    protected targetAchieved(agent: Agent): boolean {
+      return targetAchieved(this.agentData(agent));
     }
 
     protected get AllAgents(): Array<Agent> {
@@ -130,5 +137,11 @@
   .promoteIcon {
     display: inline-block;
     vertical-align: middle;
+  }
+
+  .avatarCheck {
+    font-size: 16px;
+    margin-top: 12px;
+    margin-left: 20px;
   }
 </style>

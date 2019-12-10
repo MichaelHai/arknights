@@ -192,7 +192,7 @@
   import ItemAmountList from '@/components/ItemAmountList.vue';
   import {AgentData, Getters, Mutations} from '@/store';
   import NumberInput from '@/components/NumberInput.vue';
-  import _ from 'lodash';
+  import {targetAchieved} from '@/model/Utils';
 
   @Component({
     components: {NumberInput, ItemAmountList},
@@ -211,13 +211,7 @@
     }
 
     protected get targetAchieved(): boolean {
-      const current = {
-        level: this.agentData.level,
-        promote: this.agentData.promote,
-        skillLevel: this.agentData.skillLevel,
-        skillSpecialize: this.agentData.skillSpecialize,
-      };
-      return _.isEqual(current, this.agentData.planned);
+      return targetAchieved(this.agentData);
     }
 
     protected rotatePlannedPromote() {
