@@ -29,15 +29,15 @@
             <v-col v-if="agentData(agent).skillLevel < 7" class="skillLevel">
               技能等级: {{ agentData(agent).skillLevel }}
             </v-col>
-            <v-col v-else cols="3" v-for="skillSpecializeRank in agentData(agent).skillSpecialize"
-                   :key="skillSpecializeRank.skillName">
+            <v-col v-else cols="3" v-for="(skillSpecializeItems, index) in agentDetail[agent].skillSpecializeItems"
+                   :key="skillSpecializeItems.skillName">
               <v-img
-                :src="require(`@/assets/agents/${agent}/${skillSpecializeRank.skillName}.png`)"
+                :src="require(`@/assets/agents/${agent}/${skillSpecializeItems.skillName}.png`)"
                 contain
                 height="32"
               />
               <div class="rank">
-                Rank {{ skillSpecializeRank.specializeRank }}
+                Rank {{ agentData(agent).skillSpecialize[index] }}
               </div>
             </v-col>
           </v-row>

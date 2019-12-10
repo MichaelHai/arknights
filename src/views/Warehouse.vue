@@ -7,17 +7,13 @@
             <v-img :alt="item" :src="require(`@/assets/items/${item}.png`)"/>
           </v-col>
           <v-col>
-            <v-text-field
+            <number-input
               :value="itemCounts[item]"
-              @input="(value) => itemCountChanged(item, Number(value))"
-              type="number"
+              @input="(value) => itemCountChanged(item, value)"
               :label="item"
-              append-icon="mdi-plus"
-              @click:append="increaseItem(item)"
-              prepend-inner-icon="mdi-minus"
-              @click:prepend-inner="decreaseItem(item)"
-            >
-            </v-text-field>
+              @valueIncreased="increaseItem(item)"
+              @valueDecreased="decreaseItem(item)"
+            />
           </v-col>
         </v-row>
       </v-col>
@@ -29,8 +25,10 @@
   import {Component, Vue} from 'vue-property-decorator';
   import {Mutations} from '@/store';
   import {AllItems, Item} from '@/model';
-
-  @Component
+  import NumberInput from '@/components/NumberInput.vue';
+  @Component({
+    components: {NumberInput},
+  })
   export default class Warehouse extends Vue {
     protected get AllItems(): Array<Item> {
       return AllItems;
