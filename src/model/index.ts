@@ -30,6 +30,18 @@ export interface ItemAmount {
   amount: number;
 }
 
+export interface ItemDetail {
+  suggest: SuggestType;
+  map?: Array<Map>
+  composite?: Array<ItemAmount>;
+}
+
+export const AllMap = ['1-7'];
+export type Map = typeof AllMap[number];
+
+export const AllSuggest = ['map', 'composite'];
+export type SuggestType = typeof AllSuggest[number];
+
 export const AllAgents = ['能天使'];
 export type Agent = typeof AllAgents[number];
 

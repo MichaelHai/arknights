@@ -173,5 +173,44 @@
         }
       ]
     }
+  },
+  "items": {
+    "龙门币": {
+      "suggest": "map",
+      "map": ["CE-5"]
+    },
+    "狙击芯片": {
+      "suggest": "map",
+      "map": ["PR-B-1"]
+    },
+    "源岩": {
+      "suggest": "map",
+      "map": [
+        "s2-6",
+        "2-6"
+      ]
+    },
+    "固源岩": {
+      "suggest": "map",
+      "map": [
+        "1-7"
+      ]
+    },
+    "双酮": {
+      "suggest": "map",
+      "map": [
+        "4-5",
+        "s2-9"
+      ]
+    },
+    "酮凝集": {
+      "suggest": "composite",
+      "composite": [
+        {
+          "item": "双酮",
+          "amount": 3
+        }
+      ]
+    }
   }
 }
