@@ -8,10 +8,6 @@
       "promoteItems": {
         "level1": [
           {
-            "item": "龙门币",
-            "amount": 30000
-          },
-          {
             "item": "狙击芯片",
             "amount": 5
           },
@@ -25,10 +21,6 @@
           }
         ],
         "level2": [
-          {
-            "item": "龙门币",
-            "amount": 180000
-          },
           {
             "item": "狙击双芯片",
             "amount": 4
@@ -116,18 +108,6 @@
       "skillSpecializeItems": [
         {
           "skillName": "冲锋模式",
-          "rank1": [],
-          "rank2": [],
-          "rank3": []
-        },
-        {
-          "skillName": "扫射模式",
-          "rank1": [],
-          "rank2": [],
-          "rank3": []
-        },
-        {
-          "skillName": "过载模式",
           "rank1": [
             {
               "item": "技巧概要·卷3",
@@ -170,17 +150,23 @@
               "amount": 6
             }
           ]
+        },
+        {
+          "skillName": "扫射模式",
+          "rank1": [],
+          "rank2": [],
+          "rank3": []
+        },
+        {
+          "skillName": "过载模式",
+          "rank1": [],
+          "rank2": [],
+          "rank3": []
         }
       ]
     }
   },
   "items": {
-    "龙门币": {
-      "suggest": "map",
-      "map": [
-        "CE-5"
-      ]
-    },
     "狙击芯片": {
       "suggest": "map",
       "map": [
@@ -200,6 +186,24 @@
         "1-7"
       ]
     },
+    "固源岩组": {
+      "suggest": "composite",
+      "composite": [
+        {
+          "item": "固源岩",
+          "amount": 5
+        }
+      ]
+    },
+    "提纯源岩": {
+      "suggest": "composite",
+      "composite": [
+        {
+          "item": "固源岩组",
+          "amount": 4
+        }
+      ]
+    },
     "双酮": {
       "suggest": "map",
       "map": [
@@ -215,11 +219,140 @@
           "amount": 3
         }
       ]
+    },
+    "酮凝集组": {
+      "suggest": "map",
+      "map": [
+        "4-5",
+        "3-1"
+      ]
+    },
+    "酮阵列": {
+      "suggest": "composite",
+      "composite": [
+        {
+          "item": "酮凝集组",
+          "amount": 2
+        },
+        {
+          "item": "糖组",
+          "amount": 1
+        },
+        {
+          "item": "轻锰矿",
+          "amount": 1
+        }
+      ]
+    },
+    "异铁组": {
+      "suggest": "map",
+      "map": [
+        "S4-1",
+        "2-8"
+      ]
+    },
+    "异铁块": {
+      "suggest": "composite",
+      "composite": [
+        {
+          "item": "异铁组",
+          "amount": 2
+        },
+        {
+          "item": "全新装置",
+          "amount": 1
+        },
+        {
+          "item": "聚酸酯组",
+          "amount": 1
+        }
+      ]
+    },
+    "糖组": {
+      "suggest": "map",
+      "map": [
+        "4-2"
+      ]
+    },
+    "糖聚块": {
+      "suggest": "composite",
+      "composite": [
+        {
+          "item": "糖组",
+          "amount": 2
+        },
+        {
+          "item": "异铁组",
+          "amount": 1
+        },
+        {
+          "item": "轻锰矿",
+          "amount": 1
+        }
+      ]
+    },
+    "酯原料": {
+      "suggest": "map",
+      "map": [
+        "2-6",
+        "S2-7"
+      ]
+    },
+    "聚酸酯": {
+      "suggest": "composite",
+      "composite": [
+        {
+          "item": "酯原料",
+          "amount": 3
+        }
+      ]
+    },
+    "聚酸酯组": {
+      "suggest": "composite",
+      "composite": [
+        {
+          "item": "聚酸酯",
+          "amount": 4
+        }
+      ]
+    },
+    "全新装置": {
+      "suggest": "map",
+      "map": [
+        "4-10",
+        "3-4"
+      ]
+    },
+    "轻锰矿": {
+      "suggest": "map",
+      "map": [
+        "3-2"
+      ]
+    },
+    "聚合剂": {
+      "suggest": "composite",
+      "composite": [
+        {
+          "item": "提纯源岩",
+          "amount": 1
+        },
+        {
+          "item": "异铁块",
+          "amount": 1
+        },
+        {
+          "item": "酮阵列",
+          "amount": 1
+        }
+      ]
+    },
+    "技巧概要·卷3": {
+      "suggest": "map",
+      "map": ["CA-5"]
     }
   },
   "maps": {
     "1-7": [
-      "龙门币",
       "源岩",
       "固源岩",
       "破损装置",
@@ -229,7 +362,6 @@
       "双酮"
     ],
     "1-8": [
-
     ]
   }
 }

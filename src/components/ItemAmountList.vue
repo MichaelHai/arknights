@@ -178,14 +178,17 @@
       const unprocessedItems: Array<ItemAmount> = [...this.items];
       const mapItemsMap = new Map<Item, number>();
       const compositeItemsMap = new Map<Item, number>();
-      for (let item of unprocessedItems) {
+      while (unprocessedItems.length !== 0) {
+        const item = unprocessedItems.pop()!;
         const itemName = item.item;
         if (this.itemDetails[itemName].suggest === 'map') {
           this.addToMap(item, mapItemsMap);
         } else {
-          this.addToMap(item, compositeItemsMap);
+          const countAdded = this.addToMap(item, compositeItemsMap);
           const compositeItems: Array<ItemAmount> = this.itemDetails[itemName].composite!;
-          unprocessedItems.push(...compositeItems);
+          for (let i = 0; i < countAdded; i++) {
+            unprocessedItems.push(...compositeItems);
+          }
         }
       }
 
@@ -195,23 +198,34 @@
 
     private addToList(map: Map<Item, number>, list: Array<ItemAmount>) {
       map.forEach((amount, item) => {
-        const warehouseItemCount = this.getItemAmountInWarehouse(item);
-        if (amount > warehouseItemCount) {
+        if (amount > 0) {
           list.push({
             item,
-            amount: amount - warehouseItemCount,
+            amount,
           });
         }
       });
     }
 
-    private addToMap(item: ItemAmount, mapItemsMap: Map<Item, number>) {
+    private addToMap(item: ItemAmount, mapItemsMap: Map<Item, number>): number {
       const itemName = item.item;
       let count = item.amount;
-      if (mapItemsMap.has(itemName)) {
-        count += mapItemsMap.get(itemName)!;
+      let countAdded = 0;
+      if (!mapItemsMap.has(itemName)) {
+        mapItemsMap.set(itemName, -this.getItemAmountInWarehouse(itemName));
+      }
+
+      const countBefore = mapItemsMap.get(itemName)!;
+      count += countBefore;
+      if (count <= 0) {
+        countAdded = 0;
+      } else if (countBefore < 0) {
+        countAdded = count;
+      } else {
+        countAdded = count - countBefore;
       }
       mapItemsMap.set(itemName, count);
+      return countAdded;
     }
 
     private mapClicked(map: string) {
