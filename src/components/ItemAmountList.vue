@@ -21,7 +21,7 @@
           <v-toolbar-title>{{ title }}</v-toolbar-title>
           <v-spacer/>
           <v-toolbar-items>
-            <v-btn text @click="levelUp">完成</v-btn>
+            <v-btn text @click="doLevelUp">完成</v-btn>
           </v-toolbar-items>
         </v-toolbar>
         <v-card-text class="pa-0 pt-12">
@@ -99,7 +99,7 @@
                           <item-avatar
                             :class="compositeClass(compositeItem, item.amount)"
                             :item="compositeItem.item"
-                            :text="`${compositeItem.amount} / ${ warehouseItemCounts[compositeItem.item] || 0 }`"
+                            :text="`${compositeItem.amount} / ${ getItemAmountInWarehouse(compositeItem.item) }`"
                           />
                         </v-col>
                       </template>
@@ -129,12 +129,13 @@
 
 <script lang="ts">
   import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-  import {BattleMap, Item, ItemAmount, ItemDetail} from '@/model';
+  import {Agent, AgentDetail, BattleMap, Item, ItemAmount, ItemDetail, LevelUp, LevelUpType} from '@/model';
   import ItemRequirement from '@/components/ItemRequirement.vue';
   import LootDialog from '@/components/LootDialog.vue';
   import MasterData from '@/assets/master-data.json';
   import ItemAvatar from '@/components/ItemAvatar.vue';
-  import {Mutations} from '@/store';
+  import {AgentData, Getters, Mutations} from '@/store';
+  import any = jasmine.any;
 
   @Component({
     components: {ItemAvatar, LootDialog, ItemRequirement},
@@ -144,6 +145,8 @@
     public items!: Array<ItemAmount>;
     @Prop()
     public title!: string;
+    @Prop()
+    public levelUp!: LevelUp;
 
     private showDialog: boolean = false;
     private mapItems: Array<ItemAmount> = [];
@@ -153,6 +156,7 @@
     private lootDialog: boolean = false;
     private lootDialogMap: BattleMap = '';
     private itemDetails: { [item in Item]: ItemDetail } = MasterData.items;
+    private agentDetails: { [agent in Agent]: AgentDetail } = MasterData.agents;
 
     private get warehouseItemCounts(): { [item in Item]: number } {
       return this.$store.state.itemCounts;
@@ -191,7 +195,7 @@
 
     private addToList(map: Map<Item, number>, list: Array<ItemAmount>) {
       map.forEach((amount, item) => {
-        const warehouseItemCount = this.warehouseItemCounts[item] || 0;
+        const warehouseItemCount = this.getItemAmountInWarehouse(item);
         if (amount > warehouseItemCount) {
           list.push({
             item,
@@ -215,8 +219,61 @@
       this.lootDialogMap = map;
     }
 
-    private levelUp() {
-      this.showDialog = false;
+    private doLevelUp() {
+      if (this.checkLevelUp()) {
+        this.showDialog = false;
+        this.items.forEach((item) => {
+          this.$store.commit(Mutations.ChangeItem, {
+            item: item.item,
+            amount: -item.amount,
+          });
+        });
+        switch (this.levelUp.type) {
+          case LevelUpType.PROMOTE:
+            this.$store.commit(Mutations.SetPromote, {
+              agent: this.levelUp.agent,
+              targetPromote: this.levelUp.promoteTo,
+            });
+            break;
+          case LevelUpType.SKILL:
+            this.$store.commit(Mutations.SetSkillLevel, {
+              agent: this.levelUp.agent,
+              targetSkillLevel: this.levelUp.skillUpTo,
+            });
+            break;
+          case LevelUpType.SPECIALIZE:
+            const index = this.agentDetails[this.levelUp.agent].skillSpecializeItems.findIndex((specialize) => specialize.skillName === this.levelUp.specializeTarget!.specializeSkill);
+            this.$store.commit(Mutations.SetSpecializeRank, {
+              agent: this.levelUp.agent,
+              index: index,
+              targetSpecializeRank: this.levelUp.specializeTarget!.specializeRankTo,
+            });
+        }
+      } else {
+        this.snackbar = true;
+      }
+    }
+
+    private checkLevelUp(): boolean {
+      const anyItemNotEnough = this.items.filter((item) => item.amount > this.getItemAmountInWarehouse(item.item)).length > 0;
+      if (anyItemNotEnough) {
+        this.snackbarMessage = '材料不足';
+        return false;
+      }
+
+      const agentData: AgentData = this.$store.getters[Getters.AgentData](this.levelUp.agent);
+      switch (this.levelUp.type) {
+        case LevelUpType.PROMOTE:
+          this.snackbarMessage = `请先升至精英化${this.levelUp.promoteTo! - 1}`;
+          return this.levelUp.promoteTo === (agentData.promote + 1);
+        case LevelUpType.SKILL:
+          this.snackbarMessage = `请先将技能升级至${this.levelUp.skillUpTo! - 1}`;
+          return this.levelUp.skillUpTo === (agentData.skillLevel + 1);
+        case LevelUpType.SPECIALIZE:
+          this.snackbarMessage = `请先将${this.levelUp.specializeTarget!.specializeSkill}升级至Rank ${this.levelUp.specializeTarget!.specializeRankTo - 1}`;
+          const index = this.agentDetails[this.levelUp.agent].skillSpecializeItems.findIndex((specialize) => specialize.skillName === this.levelUp.specializeTarget!.specializeSkill);
+          return this.levelUp.specializeTarget!.specializeRankTo === agentData.skillSpecialize[index] + 1;
+      }
     }
 
     private compositeOne(item: Item) {
@@ -242,7 +299,7 @@
       if (this.itemDetails[item.item].composite) {
         const compositeItems: Array<ItemAmount> = this.itemDetails[item.item].composite!;
         const isItemEnough = compositeItems.filter((toComposite) => {
-          return this.warehouseItemCounts[toComposite.item] < (toComposite.amount * item.amount);
+          return (this.getItemAmountInWarehouse(toComposite.item)) < (toComposite.amount * item.amount);
         }).length === 0;
         if (!isItemEnough) {
           this.snackbarMessage = '材料不足';
@@ -254,8 +311,12 @@
       }
     }
 
+    private getItemAmountInWarehouse(item: Item) {
+      return this.warehouseItemCounts[item] || 0;
+    }
+
     private compositeClass(compositeItem: ItemAmount, itemCount: number): { [className: string]: boolean } {
-      const warehouseAmount = this.warehouseItemCounts[compositeItem.item] || 0;
+      const warehouseAmount = this.getItemAmountInWarehouse(compositeItem.item);
       return {
         'red--text': compositeItem.amount > warehouseAmount,
         'green--text': compositeItem.amount * itemCount <= warehouseAmount,

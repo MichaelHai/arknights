@@ -1,3 +1,6 @@
+import {LevelUpType} from '@/model';
+import {LevelUpType} from '@/model';
+import {LevelUpType} from '@/model';
 <template>
   <v-card elevation="0">
     <v-img
@@ -111,12 +114,14 @@
           <item-amount-list
             v-if="agentDetail.promoteItems.level1 && agentData.promote < 1"
             :items="agentDetail.promoteItems.level1"
+            :levelUp="promoteLevelUp(1)"
             title="精英化1"
             :class="{'white--text': agentData.planned.promote >= 1}"
           />
           <item-amount-list
             v-if="agentDetail.promoteItems.level2 && agentData.promote < 2"
             :items="agentDetail.promoteItems.level2"
+            :levelUp="promoteLevelUp(2)"
             title="精英化2"
             :class="{'white--text': agentData.planned.promote >= 2}"
           />
@@ -132,6 +137,7 @@
               :key="index"
               :items="items"
               :title="`${index}`"
+              :levelUp="skillLevelUp(index)"
               :class="{'white--text': `level${agentData.planned.skillLevel}` >= index}"
             />
           </template>
@@ -157,18 +163,21 @@
               <item-amount-list
                 v-if="agentData.skillSpecialize[index] < 1"
                 :items="skill.rank1"
+                :levelUp="specializeLevelUp(skill.skillName, 1)"
                 title="Rank1"
                 :class="{'white--text': agentData.planned.skillSpecialize[index] >= 1}"
               />
               <item-amount-list
                 v-if="agentData.skillSpecialize[index] < 2"
                 :items="skill.rank2"
+                :levelUp="specializeLevelUp(skill.skillName, 2)"
                 title="Rank2"
                 :class="{'white--text': agentData.planned.skillSpecialize[index] >= 2}"
               />
               <item-amount-list
                 v-if="agentData.skillSpecialize[index] < 3"
                 :items="skill.rank3"
+                :levelUp="specializeLevelUp(skill.skillName, 3)"
                 title="Rank3"
                 :class="{'white--text': agentData.planned.skillSpecialize[index] >= 3}"
               />
@@ -187,10 +196,10 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator';
-  import {Agent, AgentDetail} from '@/model';
+  import {Agent, AgentDetail, LevelUp, LevelUpType} from '@/model';
   import MasterData from '@/assets/master-data.json';
   import ItemAmountList from '@/components/ItemAmountList.vue';
-  import {AgentData, Getters, Mutations} from '@/store';
+  import {AgentData, Getters, Mutations, PromoteLevel, SkillLevel, SkillSpecializeRank} from '@/store';
   import NumberInput from '@/components/NumberInput.vue';
   import {targetAchieved} from '@/model/Utils';
 
@@ -258,6 +267,33 @@
         index: index,
         targetSpecializeRank,
       });
+    }
+
+    private promoteLevelUp(to: number): LevelUp {
+      return {
+        type: LevelUpType.PROMOTE,
+        promoteTo: to as PromoteLevel,
+        agent: this.agent,
+      };
+    }
+
+    private skillLevelUp(to: string): LevelUp {
+      return {
+        type: LevelUpType.SKILL,
+        skillUpTo: Number.parseInt(to.substring(5)) as SkillLevel,
+        agent: this.agent,
+      };
+    }
+
+    private specializeLevelUp(skillName: string, to: SkillSpecializeRank): LevelUp {
+      return {
+        type: LevelUpType.SPECIALIZE,
+        specializeTarget: {
+          specializeSkill: skillName,
+          specializeRankTo: to,
+        },
+        agent: this.agent,
+      };
     }
   }
 </script>
