@@ -129,7 +129,7 @@
 
 <script lang="ts">
   import {Component, Prop, Vue, Watch} from 'vue-property-decorator';
-  import {Item, ItemAmount, ItemDetail} from '@/model';
+  import {BattleMap, Item, ItemAmount, ItemDetail} from '@/model';
   import ItemRequirement from '@/components/ItemRequirement.vue';
   import LootDialog from '@/components/LootDialog.vue';
   import MasterData from '@/assets/master-data.json';
@@ -151,7 +151,7 @@
     private snackbar: boolean = false;
     private snackbarMessage: string = '';
     private lootDialog: boolean = false;
-    private lootDialogMap: string = '';
+    private lootDialogMap: BattleMap = '';
     private itemDetails: { [item in Item]: ItemDetail } = MasterData.items;
 
     private get warehouseItemCounts(): { [item in Item]: number } {

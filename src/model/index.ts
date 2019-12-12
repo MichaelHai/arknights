@@ -32,12 +32,12 @@ export interface ItemAmount {
 
 export interface ItemDetail {
   suggest: SuggestType;
-  map?: Array<Map>
+  map?: Array<BattleMap>
   composite?: Array<ItemAmount>;
 }
 
 export const AllMap = ['1-7'];
-export type Map = typeof AllMap[number];
+export type BattleMap = typeof AllMap[number];
 
 export const AllSuggest = ['map', 'composite'];
 export type SuggestType = typeof AllSuggest[number];

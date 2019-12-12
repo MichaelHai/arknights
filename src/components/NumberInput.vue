@@ -8,6 +8,7 @@
     @click:append="$emit('valueIncreased')"
     prepend-inner-icon="mdi-minus"
     @click:prepend-inner="$emit('valueDecreased')"
+    dense
   >
   </v-text-field>
 </template>
@@ -25,5 +26,8 @@
 </script>
 
 <style scoped lang="less">
-
+  /deep/ .v-label--active {
+    margin-left: -24px;
+    overflow: visible !important;
+  }
 </style>
