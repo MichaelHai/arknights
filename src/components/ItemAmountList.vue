@@ -66,7 +66,7 @@
                           </v-row>
                         </v-col>
                       </template>
-                      <v-col cols="6" v-if="mapItems.length % 2 === 1" />
+                      <v-col cols="6" v-if="mapItems.length % 2 === 1"/>
                     </v-row>
                   </v-list-item-content>
                 </v-list-item>
@@ -97,6 +97,7 @@
                           cols="2"
                         >
                           <item-avatar
+                            :class="compositeClass(compositeItem, item.amount)"
                             :item="compositeItem.item"
                             :text="`${compositeItem.amount} / ${ warehouseItemCounts[compositeItem.item] || 0 }`"
                           />
@@ -104,8 +105,8 @@
                       </template>
                       <v-spacer/>
                       <v-col cols="3" class="text-end">
-                        <v-btn small tile class="ma-1">合成</v-btn>
-                        <v-btn small tile class="ma-1"> 全部</v-btn>
+                        <v-btn small tile class="ma-1" @click="compositeOne(item.item)">合成</v-btn>
+                        <v-btn small tile class="ma-1" @click="composite(item)"> 全部</v-btn>
                       </v-col>
                     </v-row>
                   </v-list-item-content>
@@ -121,6 +122,8 @@
       :map="lootDialogMap"
       v-model="lootDialog"
     />
+
+    <v-snackbar v-model="snackbar" :timeout="3000">{{ snackbarMessage }}</v-snackbar>
   </div>
 </template>
 
@@ -131,6 +134,7 @@
   import LootDialog from '@/components/LootDialog.vue';
   import MasterData from '@/assets/master-data.json';
   import ItemAvatar from '@/components/ItemAvatar.vue';
+  import {Mutations} from '@/store';
 
   @Component({
     components: {ItemAvatar, LootDialog, ItemRequirement},
@@ -144,6 +148,8 @@
     private showDialog: boolean = false;
     private mapItems: Array<ItemAmount> = [];
     private compositeItems: Array<ItemAmount> = [];
+    private snackbar: boolean = false;
+    private snackbarMessage: string = '';
     private lootDialog: boolean = false;
     private lootDialogMap: string = '';
     private itemDetails: { [item in Item]: ItemDetail } = MasterData.items;
@@ -155,26 +161,32 @@
     @Watch('showDialog')
     private showDialogChanged() {
       if (this.showDialog) {
-        const unprocessedItems: Array<ItemAmount> = [...this.items];
-        const mapItemsMap = new Map<Item, number>();
-        const compositeItemsMap = new Map<Item, number>();
-        for (let item of unprocessedItems) {
-          const itemName = item.item;
-          if (this.itemDetails[itemName].suggest === 'map') {
-            this.addToMap(item, mapItemsMap);
-          } else {
-            this.addToMap(item, compositeItemsMap);
-            const compositeItems: Array<ItemAmount> = this.itemDetails[itemName].composite!;
-            unprocessedItems.push(...compositeItems);
-          }
-        }
-
-        this.addToList(mapItemsMap, this.mapItems);
-        this.addToList(compositeItemsMap, this.compositeItems);
+        this.calculateSuggestion();
       } else {
         this.mapItems = [];
         this.compositeItems = [];
       }
+    }
+
+    private calculateSuggestion() {
+      this.mapItems = [];
+      this.compositeItems = [];
+      const unprocessedItems: Array<ItemAmount> = [...this.items];
+      const mapItemsMap = new Map<Item, number>();
+      const compositeItemsMap = new Map<Item, number>();
+      for (let item of unprocessedItems) {
+        const itemName = item.item;
+        if (this.itemDetails[itemName].suggest === 'map') {
+          this.addToMap(item, mapItemsMap);
+        } else {
+          this.addToMap(item, compositeItemsMap);
+          const compositeItems: Array<ItemAmount> = this.itemDetails[itemName].composite!;
+          unprocessedItems.push(...compositeItems);
+        }
+      }
+
+      this.addToList(mapItemsMap, this.mapItems);
+      this.addToList(compositeItemsMap, this.compositeItems);
     }
 
     private addToList(map: Map<Item, number>, list: Array<ItemAmount>) {
@@ -205,6 +217,49 @@
 
     private levelUp() {
       this.showDialog = false;
+    }
+
+    private compositeOne(item: Item) {
+      this.composite({item, amount: 1});
+    }
+
+    private composite(item: ItemAmount) {
+      const canComposite = this.checkComposite(item);
+
+      if (!canComposite) {
+        this.snackbar = true;
+        return;
+      }
+      this.$store.commit(Mutations.ChangeItem, {item: item.item, amount: item.amount});
+      this.itemDetails[item.item].composite!.forEach((toComposite) => {
+        this.$store.commit(Mutations.ChangeItem, {item: toComposite.item, amount: -item.amount * toComposite.amount});
+      });
+
+      this.calculateSuggestion();
+    }
+
+    private checkComposite(item: ItemAmount): boolean {
+      if (this.itemDetails[item.item].composite) {
+        const compositeItems: Array<ItemAmount> = this.itemDetails[item.item].composite!;
+        const isItemEnough = compositeItems.filter((toComposite) => {
+          return this.warehouseItemCounts[toComposite.item] < (toComposite.amount * item.amount);
+        }).length === 0;
+        if (!isItemEnough) {
+          this.snackbarMessage = '材料不足';
+        }
+        return isItemEnough;
+      } else {
+        this.snackbarMessage = '无法合成';
+        return false;
+      }
+    }
+
+    private compositeClass(compositeItem: ItemAmount, itemCount: number): { [className: string]: boolean } {
+      const warehouseAmount = this.warehouseItemCounts[compositeItem.item] || 0;
+      return {
+        'red--text': compositeItem.amount > warehouseAmount,
+        'green--text': compositeItem.amount * itemCount <= warehouseAmount,
+      };
     }
   }
 </script>

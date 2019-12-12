@@ -1,5 +1,5 @@
 <template>
-  <v-row dense :class="{'itemAmountEnough': (warehouseItemCounts[item.item] || 0) >= item.amount}">
+  <v-row dense :class="{'green--text': (warehouseItemCounts[item.item] || 0) >= item.amount}">
     <v-col cols="5">
       <v-avatar size="40">
         <img
@@ -38,9 +38,5 @@
   .itemName {
     overflow: hidden;
     white-space: nowrap;
-  }
-
-  .itemAmountEnough {
-    color: limegreen;
   }
 </style>
