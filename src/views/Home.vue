@@ -1,6 +1,6 @@
 <template>
   <div>
-    <agent-detail-card v-if="homeAgent" :agent="homeAgent"/>
+    <character-detail-card v-if="homeCharacterId" :characterId="homeCharacterId"/>
     <v-container v-else>
       <v-row justify="center">
         <h2>Welcome to</h2>
@@ -18,15 +18,14 @@
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-  import AgentDetailCard from '@/components/AgentDetailCard.vue';
-  import {Agent} from '@/model';
+  import CharacterDetailCard from '@/components/CharacterDetailCard.vue';
 
   @Component({
-    components: {AgentDetailCard},
+    components: {CharacterDetailCard},
   })
   export default class Home extends Vue {
-    protected get homeAgent(): Agent | null {
-      return this.$store.state.homeAgent;
+    protected get homeCharacterId(): string | null {
+      return this.$store.state.homeCharacterId;
     }
   }
 </script>

@@ -1,0 +1,3 @@
+[submodule "src/assets/ArknightsGameData"]
+	path = src/assets/ArknightsGameData
+	url = https://github.com/Perfare/ArknightsGameData.git

@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import Vuex, {Plugin, StoreOptions} from 'vuex';
 import VuexPersist from 'vuex-persist';
-import {Agent, AgentDetail, Item} from '@/model';
-import MasterData from '@/assets/master-data.json';
+import {CharacterDetail, Characters} from '@/model';
 
 Vue.use(Vuex);
 
@@ -12,156 +11,161 @@ const vuexPersist = new VuexPersist({
 });
 
 export interface ArknightsState {
-  itemCounts: { [item in Item]?: number };
-  agentData: { [agent in Agent]?: AgentData };
-  homeAgent: Agent | null;
+  itemCounts: { [item: string]: number };
+  characterData: { [character: string]: CharacterData };
+  homeCharacterId: string | null;
 }
 
-export interface AgentData {
+export interface CharacterData {
   level: number;
-  promote: PromoteLevel;
-  skillLevel: SkillLevel;
-  skillSpecialize: Array<SkillSpecializeRank>;
+  phase: PhaseLevel;
+  allSkillLevel: AllSkillLevel;
+  skillLevel: { [skillId: string]: SkillLevel };
   planned: {
     level: number;
-    promote: PromoteLevel;
-    skillLevel: SkillLevel;
-    skillSpecialize: Array<SkillSpecializeRank>;
+    phase: PhaseLevel;
+    allSkillLevel: AllSkillLevel;
+    skillLevel: { [skillId: string]: SkillLevel };
   }
 }
 
-export type SkillSpecializeRank = 0 | 1 | 2 | 3;
+export type SkillLevel = 0 | 1 | 2 | 3;
 
 export enum Mutations {
   ChangeItem = 'ChangeItem',
   SetItemCount = 'SetItemCount',
-  SetHomeAgent = 'SetHomeAgent',
-  SetPlannedPromote = 'SetPlannedPromote',
-  SetPromote = 'SetPromote',
+  SetHomeCharacter = 'SetHomeCharacter',
+  SetPlannedPhase = 'SetPlannedPhase',
+  SetPhase = 'SetPhase',
+  SetAllSkillLevel = 'SetAllSkillLevel',
+  SetPlannedAllSkillLevel = 'SetPlannedAllSkillLevel',
   SetSkillLevel = 'SetSkillLevel',
   SetPlannedSkillLevel = 'SetPlannedSkillLevel',
-  SetSpecializeRank = 'SetSpecializeRank',
-  SetPlannedSpecializeRank = 'SetPlannedSpecializeRank',
 }
 
 export enum Getters {
-  AgentData = 'AgentData',
+  CharacterData = 'AgentData',
 }
 
 export interface ItemChangePayload {
-  item: Item;
+  item: string;
   amount: number;
 }
 
 export interface SetPromotePayload {
-  agent: Agent;
-  targetPromote: PromoteLevel;
+  characterId: string;
+  targetPhase: PhaseLevel;
 }
 
 export interface SetSkillLevelPayload {
-  agent: Agent;
-  targetSkillLevel: SkillLevel;
+  characterId: string;
+  targetAllSkillLevel: AllSkillLevel;
 }
 
 export interface SetSpecializeRankPayload {
-  agent: Agent;
-  index: number;
-  targetSpecializeRank: SkillSpecializeRank
+  characterId: string;
+  skillId: string;
+  targetSkillLevel: SkillLevel
 }
 
-export type SkillLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type AllSkillLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-export type PromoteLevel = 0 | 1 | 2;
+export type PhaseLevel = 0 | 1 | 2;
 
-function createAgentData(agent: Agent): AgentData {
-  const agents: { [agent in Agent]: AgentDetail } = MasterData.agents;
-  const agentMasterData: AgentDetail = agents[agent];
-  const skillSpecialize: Array<SkillSpecializeRank> = agentMasterData.skillSpecializeItems
-    .map(() => 0 as SkillSpecializeRank);
+function createSkillLevel(skills: Array<string>) {
+  return skills.reduce((result: { [skillId: string]: SkillLevel }, current) => {
+    result[current] = 0;
+    return result;
+  }, {});
+}
+
+function createCharacter(character: string): CharacterData {
+  const characterDetail: CharacterDetail = Characters[character];
+  const skills: Array<string> = characterDetail.skills.map((skill) => skill.skillId);
   return {
     level: 1,
-    promote: 0,
-    skillLevel: 1,
-    skillSpecialize,
+    phase: 0,
+    allSkillLevel: 1,
+    skillLevel: createSkillLevel(skills),
     planned: {
       level: 1,
-      promote: 0,
-      skillLevel: 1,
-      skillSpecialize: Array(...skillSpecialize),
+      phase: 0,
+      allSkillLevel: 1,
+      skillLevel: createSkillLevel(skills),
     },
   };
 }
 
-function ensureAgentData(state: ArknightsState, agent: Agent): AgentData {
-  if (!state.agentData[agent]) {
-    const agentData = createAgentData(agent);
-    Vue.set(state.agentData, agent, agentData);
+function ensureCharacterData(state: ArknightsState, character: string): CharacterData {
+  if (!state.characterData[character]) {
+    const characterData = createCharacter(character);
+    Vue.set(state.characterData, character, characterData);
   }
-  return state.agentData[agent]!;
+  return state.characterData[character]!;
 }
 
-function ensureSkillLevel(level: number): SkillLevel {
-  if (level > 7) {
-    return 7;
-  } else if (level < 1) {
-    return 1;
+function ensureAllSkillLevel(level: number): AllSkillLevel {
+  if (level > 6) {
+    return 6;
+  } else if (level < 0) {
+    return 0;
   } else {
-    return level as SkillLevel;
+    return level as AllSkillLevel;
   }
 }
 
-function ensurePlannedSkillLevel(agentData: AgentData) {
-  if (agentData.planned.skillLevel < agentData.skillLevel) {
-    agentData.planned.skillLevel = agentData.skillLevel;
+function ensurePlannedAllSkillLevel(agentData: CharacterData) {
+  if (agentData.planned.allSkillLevel < agentData.allSkillLevel) {
+    agentData.planned.allSkillLevel = agentData.allSkillLevel;
   }
 }
 
-function ensurePromoteLevel(targetPromote: number): PromoteLevel {
+function ensurePhase(targetPromote: number): PhaseLevel {
   if (targetPromote > 2) {
     return 2;
   } else if (targetPromote < 0) {
     return 0;
   } else {
-    return targetPromote as PromoteLevel;
+    return targetPromote as PhaseLevel;
   }
 }
 
-function ensurePlannedPromote(agentData: AgentData) {
-  if (agentData.planned.promote < agentData.promote) {
-    agentData.planned.promote = agentData.promote;
+function ensurePlannedPhase(agentData: CharacterData) {
+  if (agentData.planned.phase < agentData.phase) {
+    agentData.planned.phase = agentData.phase;
   }
 }
 
-function ensureSkillSpecializeRank(targetSpecializeRank: number): SkillSpecializeRank {
-  if (targetSpecializeRank > 3) {
+function ensureSkillLevel(skillLevel: number): SkillLevel {
+  if (skillLevel > 3) {
     return 3;
-  } else if (targetSpecializeRank < 0) {
+  } else if (skillLevel < 0) {
     return 0;
   } else {
-    return targetSpecializeRank as SkillSpecializeRank;
+    return skillLevel as SkillLevel;
   }
 }
 
-function ensurePlannedSkillSpecializeRank(agentData: AgentData, index: number) {
-  if (agentData.planned.skillSpecialize[index] < agentData.skillSpecialize[index]) {
-    Vue.set(agentData.planned.skillSpecialize, index, agentData.skillSpecialize[index]);
+function ensurePlannedSkillLevel(characterData: CharacterData, skillId: string) {
+  if (characterData.planned.skillLevel[skillId] < characterData.skillLevel[skillId]) {
+    Vue.set(characterData.planned.skillLevel, skillId, characterData.skillLevel[skillId]);
   }
 }
 
 const options: StoreOptions<ArknightsState> = {
   state: {
     itemCounts: {},
-    agentData: {},
-    homeAgent: null,
+    characterData: {},
+    homeCharacterId: null,
   },
   getters: {
-    [Getters.AgentData]: (state) => (agent: Agent) => {
-      let agentData = state.agentData[agent];
-      if (!agentData) {
-        agentData = createAgentData(agent);
+    [Getters.CharacterData]: (state) => (agent: string) => {
+      let characterData = state.characterData[agent];
+      if (!characterData) {
+        characterData = createCharacter(agent);
       }
 
-      return agentData;
+      return characterData;
     },
   },
   mutations: {
@@ -177,38 +181,38 @@ const options: StoreOptions<ArknightsState> = {
     [Mutations.SetItemCount]: (state: ArknightsState, payload: ItemChangePayload) => {
       Vue.set(state.itemCounts, payload.item, payload.amount < 0 ? 0 : payload.amount);
     },
-    [Mutations.SetHomeAgent]: (state: ArknightsState, homeAgent: Agent) => {
-      state.homeAgent = homeAgent;
+    [Mutations.SetHomeCharacter]: (state: ArknightsState, homeAgent: string) => {
+      state.homeCharacterId = homeAgent;
     },
-    [Mutations.SetPlannedPromote]: (state: ArknightsState, payload: SetPromotePayload) => {
-      const agentData: AgentData = ensureAgentData(state, payload.agent);
-      agentData.planned.promote = ensurePromoteLevel(payload.targetPromote);
-      ensurePlannedPromote(agentData);
+    [Mutations.SetPlannedPhase]: (state: ArknightsState, payload: SetPromotePayload) => {
+      const agentData: CharacterData = ensureCharacterData(state, payload.characterId);
+      agentData.planned.phase = ensurePhase(payload.targetPhase);
+      ensurePlannedPhase(agentData);
     },
-    [Mutations.SetPromote]: (state: ArknightsState, payload: SetPromotePayload) => {
-      const agentData: AgentData = ensureAgentData(state, payload.agent);
-      agentData.promote = ensurePromoteLevel(payload.targetPromote);
-      ensurePlannedPromote(agentData);
+    [Mutations.SetPhase]: (state: ArknightsState, payload: SetPromotePayload) => {
+      const agentData: CharacterData = ensureCharacterData(state, payload.characterId);
+      agentData.phase = ensurePhase(payload.targetPhase);
+      ensurePlannedPhase(agentData);
     },
-    [Mutations.SetSkillLevel]: (state: ArknightsState, payload: SetSkillLevelPayload) => {
-      const agentData: AgentData = ensureAgentData(state, payload.agent);
-      agentData.skillLevel = ensureSkillLevel(payload.targetSkillLevel);
-      ensurePlannedSkillLevel(agentData);
+    [Mutations.SetAllSkillLevel]: (state: ArknightsState, payload: SetSkillLevelPayload) => {
+      const agentData: CharacterData = ensureCharacterData(state, payload.characterId);
+      agentData.allSkillLevel = ensureAllSkillLevel(payload.targetAllSkillLevel);
+      ensurePlannedAllSkillLevel(agentData);
     },
-    [Mutations.SetPlannedSkillLevel]: (state: ArknightsState, payload: SetSkillLevelPayload) => {
-      const agentData: AgentData = ensureAgentData(state, payload.agent);
-      agentData.planned.skillLevel = ensureSkillLevel(payload.targetSkillLevel);
-      ensurePlannedSkillLevel(agentData);
+    [Mutations.SetPlannedAllSkillLevel]: (state: ArknightsState, payload: SetSkillLevelPayload) => {
+      const agentData: CharacterData = ensureCharacterData(state, payload.characterId);
+      agentData.planned.allSkillLevel = ensureAllSkillLevel(payload.targetAllSkillLevel);
+      ensurePlannedAllSkillLevel(agentData);
     },
-    [Mutations.SetSpecializeRank]: (state: ArknightsState, payload: SetSpecializeRankPayload) => {
-      const agentData: AgentData = ensureAgentData(state, payload.agent);
-      Vue.set(agentData.skillSpecialize, payload.index, ensureSkillSpecializeRank(payload.targetSpecializeRank));
-      ensurePlannedSkillSpecializeRank(agentData, payload.index);
+    [Mutations.SetSkillLevel]: (state: ArknightsState, payload: SetSpecializeRankPayload) => {
+      const agentData: CharacterData = ensureCharacterData(state, payload.characterId);
+      Vue.set(agentData.skillLevel, payload.skillId, ensureSkillLevel(payload.targetSkillLevel));
+      ensurePlannedSkillLevel(agentData, payload.skillId);
     },
-    [Mutations.SetPlannedSpecializeRank]: (state: ArknightsState, payload: SetSpecializeRankPayload) => {
-      const agentData: AgentData = ensureAgentData(state, payload.agent);
-      Vue.set(agentData.planned.skillSpecialize, payload.index, ensureSkillSpecializeRank(payload.targetSpecializeRank));
-      ensurePlannedSkillSpecializeRank(agentData, payload.index);
+    [Mutations.SetPlannedSkillLevel]: (state: ArknightsState, payload: SetSpecializeRankPayload) => {
+      const agentData: CharacterData = ensureCharacterData(state, payload.characterId);
+      Vue.set(agentData.planned.skillLevel, payload.skillId, ensureSkillLevel(payload.targetSkillLevel));
+      ensurePlannedSkillLevel(agentData, payload.skillId);
     },
   },
   actions: {},

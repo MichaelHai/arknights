@@ -2,52 +2,52 @@
   <div>
     <v-list dense>
       <v-list-item
-        v-for="agent in AllAgents"
-        :key="agent"
-        @click="agentClicked(agent)"
+        v-for="characterId in characters"
+        :key="characterId"
+        @click="characterClicked(characterId)"
       >
         <v-list-item-avatar class="avatar" tile>
-          <v-img :src="require(`@/assets/agents/${agent}/avatar.png`)">
-            <v-icon class="avatarCheck" color="success" v-if="targetAchieved(agent)">mdi-check-circle</v-icon>
+          <v-img :src="characterAvatar(characterId)">
+            <v-icon class="avatarCheck" color="success" v-if="targetAchieved(characterId)">mdi-check-circle</v-icon>
           </v-img>
         </v-list-item-avatar>
 
         <v-list-item-content>
           <v-row dense>
             <v-col cols="3">
-              <v-list-item-title v-text="agent"/>
-              <v-list-item-subtitle v-text="getAgentDetail(agent).nameEN"/>
+              <v-list-item-title v-text="characterDetail(characterId).name"/>
+              <v-list-item-subtitle v-text="characterDetail(characterId).appellation"/>
               <v-list-item-subtitle>
                 <v-img
-                  :src="require(`@/assets/meta/精英_${agentData(agent).promote}.png`)"
+                  :src="phaseIcon(characterData(characterId).phase)"
                   contain
                   height="13"
                   width="20"
-                  class="promoteIcon"
+                  class="phaseIcon"
                 />
-                Lv. {{ agentData(agent).level }}
+                Lv. {{ characterData(characterId).level }}
               </v-list-item-subtitle>
             </v-col>
-            <v-col v-if="agentData(agent).skillLevel < 7" class="skillLevel">
-              技能等级: {{ agentData(agent).skillLevel }}
+            <v-col v-if="characterData(characterId).allSkillLevel < 7" class="skillLevel">
+              技能等级: {{ characterData(characterId).allSkillLevel }}
             </v-col>
-            <v-col v-else cols="3" v-for="(skillSpecializeItems, index) in agentDetail[agent].skillSpecializeItems"
-                   :key="skillSpecializeItems.skillName">
+            <v-col v-else cols="3" v-for="(skillLevel, index) in characterData(characterId).skillLevel"
+                   :key="`${characterId}_skill_${index}`">
               <v-img
-                :src="require(`@/assets/agents/${agent}/${skillSpecializeItems.skillName}.png`)"
+                :src="skillIcon(characterDetail(characterId).skills[i].skillId)"
                 contain
                 height="32"
               />
               <div class="rank">
-                Rank {{ agentData(agent).skillSpecialize[index] }}
+                Rank {{ characterData(characterId).skillLevel[index] }}
               </div>
             </v-col>
           </v-row>
         </v-list-item-content>
 
-        <v-list-item-action @click.prevent.stop="homeClicked(agent)">
+        <v-list-item-action @click.prevent.stop="homeClicked(characterId)">
           <v-icon
-            v-if="agent === homeAgent"
+            v-if="characterId === homeCharacterId"
             color="yellow"
           >
             mdi-home
@@ -63,62 +63,63 @@
     </v-list>
 
     <v-bottom-sheet v-model="isBottomSheetShow" :scrollable="true">
-      <agent-detail-card :agent="agentToShowInBottomSheet"/>
+      <character-detail-card :character="characterShownInBottomSheet"/>
     </v-bottom-sheet>
   </div>
 </template>
 
 <script lang="ts">
-  import {Component, Vue} from 'vue-property-decorator';
-  import {Agent, AgentDetail, AllAgents} from '@/model';
-  import MasterData from '@/assets/master-data.json';
-  import {AgentData, Getters, Mutations} from '@/store';
-  import AgentDetailCard from '@/components/AgentDetailCard.vue';
+  import {Component} from 'vue-property-decorator';
+  import {CharacterDetail, Characters} from '@/model';
+  import {CharacterData, Getters, Mutations} from '@/store';
+  import CharacterDetailCard from '@/components/CharacterDetailCard.vue';
+  import {mixins} from 'vue-class-component';
+  import ImageHelper from '@/model/ImageHelper';
   import {targetAchieved} from '@/model/Utils';
 
   @Component({
-    components: {AgentDetailCard},
+    components: {CharacterDetailCard},
   })
-  export default class Planner extends Vue {
-    private agentDetail: { [agent in Agent]: AgentDetail } = MasterData.agents;
+  export default class Planner extends mixins(ImageHelper) {
     private isBottomSheetShow: boolean = false;
-    private agentToShowInBottomSheet: Agent | null = null;
+    private characterShownInBottomSheet: string | null = null;
 
-    private agentData(agent: Agent): AgentData {
-      return this.$store.getters[Getters.AgentData](agent);
+    private characterData(characterId: string): CharacterData {
+      return this.$store.getters[Getters.CharacterData](characterId);
     }
 
-    protected targetAchieved(agent: Agent): boolean {
-      return targetAchieved(this.agentData(agent));
+    protected targetAchieved(characterId: string): boolean {
+      return targetAchieved(this.characterData(characterId));
     }
 
-    protected get AllAgents(): Array<Agent> {
-      return AllAgents;
+    protected get characters(): Array<string> {
+      return Object.keys(Characters)
+        .sort((c1, c2) => Characters[c2].rarity - Characters[c1].rarity);
     }
 
-    protected homeClicked(agent: Agent): void {
-      if (agent === this.homeAgent) {
-        this.homeAgent = null;
+    protected homeClicked(characterId: string): void {
+      if (characterId === this.homeCharacterId) {
+        this.homeCharacterId = null;
       } else {
-        this.homeAgent = agent;
+        this.homeCharacterId = characterId;
       }
     }
 
-    private set homeAgent(agent: Agent | null) {
-      this.$store.commit(Mutations.SetHomeAgent, agent);
+    private set homeCharacterId(characterId: string | null) {
+      this.$store.commit(Mutations.SetHomeCharacter, characterId);
     }
 
-    private get homeAgent(): Agent | null {
-      return this.$store.state.homeAgent;
+    private get homeCharacterId(): string | null {
+      return this.$store.state.homeCharacterId;
     }
 
-    protected getAgentDetail(agent: Agent): AgentDetail {
-      return this.agentDetail[agent];
-    }
-
-    protected agentClicked(agent: Agent): void {
+    protected characterClicked(character: string): void {
       this.isBottomSheetShow = true;
-      this.agentToShowInBottomSheet = agent;
+      this.characterShownInBottomSheet = character;
+    }
+
+    private characterDetail(characterId: string): CharacterDetail {
+      return Characters[characterId];
     }
   }
 </script>
@@ -134,7 +135,7 @@
     margin-top: 4px;
   }
 
-  .promoteIcon {
+  .phaseIcon {
     display: inline-block;
     vertical-align: middle;
   }

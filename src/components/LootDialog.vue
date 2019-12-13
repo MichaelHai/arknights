@@ -13,14 +13,13 @@
   import {Component, Model, Prop, Vue} from 'vue-property-decorator';
   import WarehouseList from '@/components/WarehouseList.vue';
   import MasterData from '@/assets/master-data.json';
-  import {BattleMap, Item} from '@/model';
 
   @Component({
     components: {WarehouseList},
   })
   export default class LootDialog extends Vue {
     @Prop()
-    public map!: BattleMap;
+    public map!: string;
     @Model('input')
     public value!: boolean;
 
@@ -32,8 +31,8 @@
       this.$emit('input', shown);
     }
 
-    private get mapItems(): Array<Item> {
-      const maps: { [map in BattleMap]: Array<Item> } = MasterData.maps;
+    private get mapItems(): Array<string> {
+      const maps: { [map: string]: Array<string> } = MasterData.maps;
       return maps[this.map];
     }
   }

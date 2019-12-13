@@ -1,12 +1,13 @@
-import {AgentData} from '@/store';
+import {CharacterData} from '@/store';
 import _ from 'lodash';
+import {Skills} from '@/model/index';
 
-export function targetAchieved(agentData: AgentData) {
+export function targetAchieved(agentData: CharacterData) {
   const current = {
     level: agentData.level,
-    promote: agentData.promote,
+    phase: agentData.phase,
+    allSkillLevel: agentData.allSkillLevel,
     skillLevel: agentData.skillLevel,
-    skillSpecialize: agentData.skillSpecialize,
   };
   return _.isEqual(current, agentData.planned);
 }
