@@ -1,19 +1,19 @@
 <template>
   <v-row dense>
-    <v-col v-for="item in items" :key="item.itemId" cols="6">
+    <v-col v-for="item in items" :key="item" cols="6">
       <v-row dense>
         <v-col cols="4">
           <v-avatar>
-            <img :alt="item.name" :src="require(`@/assets/items/${item.iconId}.png`)"/>
+            <img :alt="itemDetail(item).name" :src="itemIcon(item)"/>
           </v-avatar>
         </v-col>
         <v-col>
           <number-input
-            :value="itemCounts[item.itemId]"
-            @input="(value) => itemCountChanged(item.itemId, value)"
-            :label="item.name"
-            @valueIncreased="increaseItem(item.itemId)"
-            @valueDecreased="decreaseItem(item.itemId)"
+            :value="itemCounts[item]"
+            @input="(value) => itemCountChanged(item, value)"
+            :label="itemDetail(item).name"
+            @valueIncreased="increaseItem(item)"
+            @valueDecreased="decreaseItem(item)"
           />
         </v-col>
       </v-row>
@@ -22,17 +22,18 @@
 </template>
 
 <script lang="ts">
-  import {Component, Prop, Vue} from 'vue-property-decorator';
+  import {Component, Prop} from 'vue-property-decorator';
   import {Mutations} from '@/store';
   import NumberInput from '@/components/NumberInput.vue';
-  import {ItemDetail} from '@/model';
+  import {mixins} from 'vue-class-component';
+  import ItemSupport from '@/components/mixins/ItemSupport';
 
   @Component({
     components: {NumberInput},
   })
-  export default class WarehouseList extends Vue {
+  export default class WarehouseList extends mixins(ItemSupport) {
     @Prop()
-    public items!: Array<ItemDetail>;
+    public items!: Array<string>;
 
     protected get itemCounts(): { [item in string]: number } {
       return this.$store.state.itemCounts;

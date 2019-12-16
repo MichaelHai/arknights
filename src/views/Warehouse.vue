@@ -5,17 +5,15 @@
 </template>
 
 <script lang="ts">
-  import {Component, Vue} from 'vue-property-decorator';
-  import {AllMaterials, ItemDetail} from '@/model';
+  import {Component} from 'vue-property-decorator';
   import NumberInput from '@/components/NumberInput.vue';
   import WarehouseList from '@/components/WarehouseList.vue';
+  import {mixins} from 'vue-class-component';
+  import ItemSupport from '@/components/mixins/ItemSupport';
 
   @Component({
     components: {WarehouseList, NumberInput},
   })
-  export default class Warehouse extends Vue {
-    protected get AllMaterials(): Array<ItemDetail> {
-      return AllMaterials;
-    }
+  export default class Warehouse extends mixins(ItemSupport) {
   }
 </script>

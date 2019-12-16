@@ -1,7 +1,7 @@
 import {Component, Vue} from 'vue-property-decorator';
-import {Skills} from '@/model/index';
+import {Skills} from '@/model';
 import {mixins} from 'vue-class-component';
-import SkillSupport from '@/model/SkillSupport';
+import SkillSupport from '@/components/mixins/SkillSupport';
 
 @Component
 export default class ImageHelper extends mixins(SkillSupport) {
@@ -25,7 +25,7 @@ export default class ImageHelper extends mixins(SkillSupport) {
 
   protected characterBackground(characterId: string): string {
     try {
-      return require(`@/assets/agents/${characterId}/background.png`);
+      return require(`@/assets/characters/${characterId}/background.png`);
     } catch (e) {
       console.error(`${characterId}'s background not found`);
       return require('@/assets/characters/fallback_background.png');

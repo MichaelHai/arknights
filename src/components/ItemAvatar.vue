@@ -2,7 +2,7 @@
   <div>
     <v-row dense justify="center">
       <v-avatar>
-        <img :src="require(`@/assets/items/${item}.png`)" :alt="item"/>
+        <img :src="itemIcon(item)" :alt="itemDetail(item).name"/>
       </v-avatar>
     </v-row>
     <v-row
@@ -16,9 +16,11 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from 'vue-property-decorator';
+  import {mixins} from 'vue-class-component';
+  import ItemSupport from '@/components/mixins/ItemSupport';
 
   @Component
-  export default class ItemAvatar extends Vue {
+  export default class ItemAvatar extends mixins(ItemSupport) {
     @Prop()
     public item!: string;
     @Prop()

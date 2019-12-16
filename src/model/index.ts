@@ -1,4 +1,4 @@
-import {PhaseLevel, AllSkillLevel, SkillLevel} from '@/store';
+import {AllSkillLevel, PhaseLevel, SkillLevel} from '@/store';
 import CharacterTable from '@/assets/ArknightsGameData/excel/character_table.json';
 import ItemTable from '@/assets/ArknightsGameData/excel/item_table.json';
 import SkillTable from '@/assets/ArknightsGameData/excel/skill_table.json';
@@ -47,7 +47,7 @@ export interface Phase {
 export interface CostItem {
   id: string;
   count: number;
-  type: CostType;
+  type?: CostType;
 }
 
 enum CostType {
@@ -57,6 +57,7 @@ enum CostType {
 enum Profession {
   SNIPER = 'SNIPER',
   CASTER = 'CASTER',
+  TOKEN = 'TOKEN',
 }
 
 export interface ItemAmount {
@@ -77,8 +78,11 @@ export interface ItemDetail {
 }
 
 export interface ItemBuildingProduct {
+  roomType: RoomType;
   formulaId: string;
 }
+
+export type RoomType = 'WORKSHOP' | 'MANUFACTURE';
 
 export interface ItemStageDrop {
   stageId: string;
@@ -91,7 +95,7 @@ export enum ItemType {
 
 export interface LevelUp {
   type: LevelUpType;
-  agent: string;
+  characterId: string;
   promoteTo?: PhaseLevel;
   skillUpTo?: AllSkillLevel;
   specializeTarget?: {
@@ -107,13 +111,5 @@ export enum LevelUpType {
 }
 
 export const Characters: { [id: string]: CharacterDetail } = CharacterTable as { [id: string]: CharacterDetail };
-
-export const Items: { [id: string]: ItemDetail } = ItemTable.items as { [id: string]: ItemDetail };
-export const AllMaterials: Array<ItemDetail> = Object.values(Items)
-  .filter((item) => item.itemType === ItemType.MATERIAL)
-  .filter((item) => item.classifyType === ItemClassifyType.MATERIAL)
-  .filter((item) => !item.itemId.startsWith('tier')) // 通用信物
-  .filter((item) => !item.itemId.startsWith('p_char_')) // 信物
-  .sort((item1, item2) => item1.sortId - item2.sortId);
 
 export const Skills: { [id: string]: SkillDetail } = SkillTable as { [id: string]: SkillDetail };

@@ -77,8 +77,7 @@
                           />
                         </v-col>
                         <v-col cols="8" class="alignToCenter">
-                          {{ skillName(skill.skillId, characterData.skillLevel[skill.skillId] +
-                          characterData.allSkillLevel) }}
+                          {{ skillName(skill.skillId, characterData) }}
                         </v-col>
                       </v-row>
                     </v-card>
@@ -123,66 +122,55 @@
 
         <v-divider/>
 
-        <!--        <v-card-title class="subtitle">技能等级</v-card-title>-->
-        <!--        <v-card-text>-->
-        <!--          <template v-for="(items, index) in characterDetail.skillLevelUpItems">-->
-        <!--            <item-amount-list-->
-        <!--              v-if="`level${agentData.allSkillLevel}` < index"-->
-        <!--              :key="index"-->
-        <!--              :items="items"-->
-        <!--              :title="`${index}`"-->
-        <!--              :levelUp="skillLevelUp(index)"-->
-        <!--              :class="{'white&#45;&#45;text': `level${agentData.planned.skillLevel}` >= index}"-->
-        <!--            />-->
-        <!--          </template>-->
-        <!--        </v-card-text>-->
+        <v-card-title class="subtitle">技能等级</v-card-title>
+        <v-card-text>
+          <template v-for="(levelUpCostCond, index) in character.allSkillLvlup">
+            <item-amount-list
+              v-if="characterData.allSkillLevel < (index + 1)"
+              :key="`skill_level_to_${index + 2}`"
+              :items="levelUpCostCond.lvlUpCost"
+              :title="`Level ${index + 2}`"
+              :levelUp="skillLevelUp(index + 1)"
+              :class="{'white--text': characterData.planned.allSkillLevel >= (index + 1)}"
+            />
+          </template>
+        </v-card-text>
 
-        <!--        <v-divider/>-->
+        <v-divider/>
 
-        <!--        <v-card-title class="subtitle">技能专精</v-card-title>-->
-        <!--        <template v-for="(skill, index) in characterDetail.skillSpecializeItems">-->
-        <!--          <template v-if="agentData.skillLevel[index] !== 3">-->
-        <!--            <v-card-subtitle :key="`${skill.skillName}_title`" class="subtitle">-->
-        <!--              <v-row>-->
-        <!--                <v-col cols="2">-->
-        <!--                  <v-img :src="require(`@/assets/agents/${characterId}/${skill.skillName}.png`)" height="24" contain/>-->
-        <!--                </v-col>-->
-        <!--                <v-col cols="3" class="skillTitle">-->
-        <!--                  {{ skill.skillName }}-->
-        <!--                </v-col>-->
-        <!--              </v-row>-->
-        <!--            </v-card-subtitle>-->
+        <v-card-title class="subtitle">技能专精</v-card-title>
+        <template v-for="(skill, index) in character.skills">
+          <template v-if="characterData.skillLevel[skill.skillId] !== 3">
+            <v-card-subtitle :key="`${skill.skillId}_title`" class="subtitle">
+              <v-row>
+                <v-col cols="2">
+                  <v-img :src="skillIcon(skill.skillId)" height="24" contain/>
+                </v-col>
+                <v-col cols="3" class="skillTitle">
+                  {{ skillName(skill.skillId, characterData) }}
+                </v-col>
+              </v-row>
+            </v-card-subtitle>
 
-        <!--            <v-card-text :key="skill.skillName">-->
-        <!--              <item-amount-list-->
-        <!--                v-if="agentData.skillLevel[index] < 1"-->
-        <!--                :items="skill.rank1"-->
-        <!--                :levelUp="specializeLevelUp(skill.skillName, 1)"-->
-        <!--                title="Rank1"-->
-        <!--                :class="{'white&#45;&#45;text': agentData.planned.skillSpecialize[index] >= 1}"-->
-        <!--              />-->
-        <!--              <item-amount-list-->
-        <!--                v-if="agentData.skillLevel[index] < 2"-->
-        <!--                :items="skill.rank2"-->
-        <!--                :levelUp="specializeLevelUp(skill.skillName, 2)"-->
-        <!--                title="Rank2"-->
-        <!--                :class="{'white&#45;&#45;text': agentData.planned.skillSpecialize[index] >= 2}"-->
-        <!--              />-->
-        <!--              <item-amount-list-->
-        <!--                v-if="agentData.skillLevel[index] < 3"-->
-        <!--                :items="skill.rank3"-->
-        <!--                :levelUp="specializeLevelUp(skill.skillName, 3)"-->
-        <!--                title="Rank3"-->
-        <!--                :class="{'white&#45;&#45;text': agentData.planned.skillSpecialize[index] >= 3}"-->
-        <!--              />-->
-        <!--            </v-card-text>-->
+            <v-card-text :key="skill.skillId">
+              <template v-for="(levelUpCostCond, rankIndex) in skill.levelUpCostCond">
+                <item-amount-list
+                  :key="`skill_${skill.skillId}_rank_${rankIndex + 1}`"
+                  v-if="characterData.skillLevel[skill.skillId] <= rankIndex"
+                  :items="levelUpCostCond.levelUpCost"
+                  :levelUp="specializeLevelUp(skill.skillId, rankIndex + 1)"
+                  :title="`Rank ${rankIndex+1}`"
+                  :class="{'white--text': characterData.planned.skillLevel[skill.skillId] > rankIndex}"
+                />
+              </template>
+            </v-card-text>
 
-        <!--            <v-divider :key="`${skill.skillName}_divider`"-->
-        <!--                       v-if="index !== characterDetail.skillSpecializeItems.length - 1"-->
-        <!--                       class="mx-4"-->
-        <!--            />-->
-        <!--          </template>-->
-        <!--        </template>-->
+            <v-divider :key="`${skill.skillId}_divider`"
+                       v-if="index !== character.skills.length - 1"
+                       class="mx-4"
+            />
+          </template>
+        </template>
       </v-card>
     </v-card-text>
   </v-card>
@@ -196,8 +184,8 @@
   import NumberInput from '@/components/NumberInput.vue';
   import {targetAchieved} from '@/model/Utils';
   import {mixins} from 'vue-class-component';
-  import ImageHelper from '@/model/ImageHelper';
-  import SkillSupport from '@/model/SkillSupport';
+  import ImageHelper from '@/components/mixins/ImageHelper';
+  import SkillSupport from '@/components/mixins/SkillSupport';
 
   @Component({
     components: {NumberInput, ItemAmountList},
@@ -264,7 +252,7 @@
       });
     }
 
-    private promoteLevelUp(to: number): LevelUp {
+    private promoteLevelUp(to: PhaseLevel): LevelUp {
       return {
         type: LevelUpType.PROMOTE,
         promoteTo: to as PhaseLevel,
@@ -272,19 +260,19 @@
       };
     }
 
-    private skillLevelUp(to: string): LevelUp {
+    private skillLevelUp(to: number): LevelUp {
       return {
         type: LevelUpType.SKILL,
-        skillUpTo: Number.parseInt(to.substring(5)) as AllSkillLevel,
+        skillUpTo: to as AllSkillLevel,
         characterId: this.characterId,
       };
     }
 
-    private specializeLevelUp(skillName: string, to: SkillLevel): LevelUp {
+    private specializeLevelUp(skillId: string, to: SkillLevel): LevelUp {
       return {
         type: LevelUpType.SPECIALIZE,
         specializeTarget: {
-          specializeSkill: skillName,
+          specializeSkill: skillId,
           specializeRankTo: to,
         },
         characterId: this.characterId,

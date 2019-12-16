@@ -1,5 +1,6 @@
 import {Component, Vue} from 'vue-property-decorator';
-import {SkillDetail, Skills} from '@/model/index';
+import {SkillDetail, Skills} from '@/model';
+import {CharacterData} from '@/store';
 
 @Component
 export default class SkillSupport extends Vue {
@@ -7,7 +8,8 @@ export default class SkillSupport extends Vue {
     return Skills[skillId];
   }
 
-  protected skillName(skillId: string, level: number): string {
+  protected skillName(skillId: string, characterData: CharacterData): string {
+    const level = characterData.skillLevel[skillId] + characterData.allSkillLevel;
     return this.skillDetail(skillId).levels[level].name;
   }
 }

@@ -63,7 +63,7 @@
     </v-list>
 
     <v-bottom-sheet v-model="isBottomSheetShow" :scrollable="true">
-      <character-detail-card :character="characterShownInBottomSheet"/>
+      <character-detail-card :characterId="characterShownInBottomSheet"/>
     </v-bottom-sheet>
   </div>
 </template>
@@ -74,7 +74,7 @@
   import {CharacterData, Getters, Mutations} from '@/store';
   import CharacterDetailCard from '@/components/CharacterDetailCard.vue';
   import {mixins} from 'vue-class-component';
-  import ImageHelper from '@/model/ImageHelper';
+  import ImageHelper from '@/components/mixins/ImageHelper';
   import {targetAchieved} from '@/model/Utils';
 
   @Component({
@@ -94,6 +94,7 @@
 
     protected get characters(): Array<string> {
       return Object.keys(Characters)
+        .filter((c) => Characters[c].profession !== 'TOKEN')
         .sort((c1, c2) => Characters[c2].rarity - Characters[c1].rarity);
     }
 
