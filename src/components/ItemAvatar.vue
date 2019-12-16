@@ -6,6 +6,7 @@
       </v-avatar>
     </v-row>
     <v-row
+      v-if="text"
       dense
       justify="center"
     >

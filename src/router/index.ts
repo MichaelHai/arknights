@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '../views/Home.vue';
 import Warehouse from '@/views/Warehouse.vue';
 import Planner from '@/views/Planner.vue';
+import MasterConfig from '@/views/MasterConfig.vue';
 
 Vue.use(VueRouter);
 
@@ -21,6 +22,11 @@ const routes = [
     path: '/planner',
     name: 'planner',
     component: Planner,
+  },
+  {
+    path: '/master',
+    name: 'master',
+    component: MasterConfig,
   },
 ];
 
