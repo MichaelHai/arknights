@@ -28,8 +28,8 @@
                 Lv. {{ characterData(characterId).level }}
               </v-list-item-subtitle>
             </v-col>
-            <v-col v-if="characterData(characterId).allSkillLevel < 7" class="skillLevel">
-              技能等级: {{ characterData(characterId).allSkillLevel }}
+            <v-col v-if="characterData(characterId).allSkillLevel < 6" class="skillLevel">
+              技能等级: {{ characterData(characterId).allSkillLevel + 1 }}
             </v-col>
             <v-col v-else cols="3" v-for="(skillLevel, index) in characterData(characterId).skillLevel"
                    :key="`${characterId}_skill_${index}`">
