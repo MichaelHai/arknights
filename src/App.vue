@@ -43,5 +43,6 @@
 <style lang="less">
   .bottom-navigation {
     margin-bottom: env(safe-area-inset-bottom) !important;
+    height: auto;
   }
 </style>
