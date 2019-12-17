@@ -60,7 +60,7 @@
             suggestion[item] = this.itemStages[item];
           }
         });
-        console.log(JSON.stringify(suggestion));
+        console.error(JSON.stringify(suggestion));
       };
     }
 
