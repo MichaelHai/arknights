@@ -85,7 +85,7 @@ function createCharacter(character: string): CharacterData {
   return {
     level: 1,
     phase: 0,
-    allSkillLevel: 1,
+    allSkillLevel: 0,
     skillLevel: createSkillLevel(skills),
     planned: {
       level: 1,

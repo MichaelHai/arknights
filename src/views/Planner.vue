@@ -31,15 +31,15 @@
             <v-col v-if="characterData(characterId).allSkillLevel < 6" class="skillLevel">
               技能等级: {{ characterData(characterId).allSkillLevel + 1 }}
             </v-col>
-            <v-col v-else cols="3" v-for="(skillLevel, index) in characterData(characterId).skillLevel"
-                   :key="`${characterId}_skill_${index}`">
+            <v-col v-else cols="3" v-for="(skillLevel, skillId) in characterData(characterId).skillLevel"
+                   :key="`${characterId}_skill_${skillId}`">
               <v-img
-                :src="skillIcon(characterDetail(characterId).skills[i].skillId)"
+                :src="skillIcon(skillId)"
                 contain
                 height="32"
               />
               <div class="rank">
-                Rank {{ characterData(characterId).skillLevel[index] }}
+                Rank {{ skillLevel }}
               </div>
             </v-col>
           </v-row>
