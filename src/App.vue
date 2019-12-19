@@ -15,7 +15,7 @@
       <router-view/>
     </v-content>
 
-    <v-bottom-navigation app class="bottom-navigation">
+    <v-bottom-navigation app fixed>
       <v-btn to="/">
         <span>首页</span>
         <v-icon>mdi-home</v-icon>

@@ -15,9 +15,10 @@
         <v-list-item-content>
           <v-row dense>
             <v-col cols="3">
-              <v-list-item-title v-text="characterDetail(characterId).name"/>
+              <v-list-item-title v-text="characterDetail(characterId).name"></v-list-item-title>
               <v-list-item-subtitle v-text="characterDetail(characterId).appellation"/>
               <v-list-item-subtitle>
+                {{ characterDetail(characterId).rarity + 1 }}星
                 <v-img
                   :src="phaseIcon(characterData(characterId).phase)"
                   contain
@@ -25,7 +26,6 @@
                   width="20"
                   class="phaseIcon"
                 />
-                Lv. {{ characterData(characterId).level }}
               </v-list-item-subtitle>
             </v-col>
             <v-col v-if="characterData(characterId).allSkillLevel < 6" class="skillLevel">
@@ -70,7 +70,7 @@
 
 <script lang="ts">
   import {Component} from 'vue-property-decorator';
-  import {CharacterDetail, Characters} from '@/model';
+  import {CharacterDetail, Characters, Profession} from '@/model';
   import {CharacterData, Getters, Mutations} from '@/store';
   import CharacterDetailCard from '@/components/CharacterDetailCard.vue';
   import {mixins} from 'vue-class-component';
@@ -94,7 +94,8 @@
 
     protected get characters(): Array<string> {
       return Object.keys(Characters)
-        .filter((c) => Characters[c].profession !== 'TOKEN')
+        .filter((c) => Characters[c].profession !== Profession.TOKEN)
+        .filter((c) => Characters[c].profession !== Profession.TRAP)
         .sort((c1, c2) => Characters[c2].rarity - Characters[c1].rarity);
     }
 

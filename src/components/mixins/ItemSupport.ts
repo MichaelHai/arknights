@@ -19,7 +19,7 @@ export default class ItemSupport extends mixins(BuildingSupport) {
       .filter((item) => item.classifyType === ItemClassifyType.MATERIAL)
       .filter((item) => !item.itemId.startsWith('tier')) // 通用信物
       .filter((item) => !item.itemId.startsWith('p_char_')) // 信物
-      .sort((item1, item2) => item2.rarity - item1.rarity)
+      .sort((item1, item2) => item1.sortId - item2.sortId)
       .map((item) => item.itemId);
   }
 

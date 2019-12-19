@@ -27,11 +27,12 @@
   import NumberInput from '@/components/NumberInput.vue';
   import {mixins} from 'vue-class-component';
   import ItemSupport from '@/components/mixins/ItemSupport';
+  import WarehouseSupport from '@/components/mixins/WarehouseSupport';
 
   @Component({
     components: {NumberInput},
   })
-  export default class WarehouseList extends mixins(ItemSupport) {
+  export default class WarehouseList extends mixins(ItemSupport, WarehouseSupport) {
     @Prop()
     public items!: Array<string>;
 
@@ -51,13 +52,6 @@
 
     protected decreaseItem(item: string): void {
       this.changeItem(item, -1);
-    }
-
-    private changeItem(item: string, amount: number) {
-      return this.$store.commit(Mutations.ChangeItem, {
-        item,
-        amount,
-      });
     }
   }
 </script>

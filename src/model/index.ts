@@ -54,10 +54,11 @@ enum CostType {
   MATERIAL = 'MATERIAL',
 }
 
-enum Profession {
+export enum Profession {
   SNIPER = 'SNIPER',
   CASTER = 'CASTER',
   TOKEN = 'TOKEN',
+  TRAP = 'TRAP',
 }
 
 export interface ItemAmount {
