@@ -149,7 +149,7 @@
     }
 
     private getDailyMissionStats() {
-      return this.$store.state.missions.daily[currentDayString()];
+      return this.$store.state.missions.daily[currentDayString()] || [];
     }
   }
 </script>
