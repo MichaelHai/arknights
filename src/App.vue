@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app id="home">
     <v-app-bar app>
       <v-img
         alt="logo"
@@ -41,8 +41,7 @@
 </script>
 
 <style lang="less">
-  .bottom-navigation {
+  #home {
     margin-bottom: env(safe-area-inset-bottom) !important;
-    height: auto;
   }
 </style>
