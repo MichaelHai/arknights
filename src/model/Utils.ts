@@ -11,3 +11,8 @@ export function targetAchieved(agentData: CharacterData) {
   };
   return _.isEqual(current, agentData.planned);
 }
+
+export function currentDayString() {
+  const currentDate = new Date();
+  return new Date(currentDate.getTime() - 4 * 60 * 60 * 1000).toLocaleDateString();
+}

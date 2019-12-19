@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex, {Plugin, StoreOptions} from 'vuex';
 import VuexPersist from 'vuex-persist';
 import {CharacterDetail, Characters} from '@/model';
+import {currentDayString} from '@/model/Utils';
 
 Vue.use(Vuex);
 
@@ -14,6 +15,9 @@ export interface ArknightsState {
   itemCounts: { [item: string]: number };
   characterData: { [character: string]: CharacterData };
   homeCharacterId: string | null;
+  missions: {
+    daily: { [day: string]: Array<boolean> }
+  }
 }
 
 export interface CharacterData {
@@ -41,6 +45,7 @@ export enum Mutations {
   SetPlannedAllSkillLevel = 'SetPlannedAllSkillLevel',
   SetSkillLevel = 'SetSkillLevel',
   SetPlannedSkillLevel = 'SetPlannedSkillLevel',
+  DailyMissionFinished = 'DailyMissionFinished',
 }
 
 export enum Getters {
@@ -157,6 +162,9 @@ const options: StoreOptions<ArknightsState> = {
     itemCounts: {},
     characterData: {},
     homeCharacterId: null,
+    missions: {
+      daily: {},
+    },
   },
   getters: {
     [Getters.CharacterData]: (state) => (agent: string) => {
@@ -213,6 +221,14 @@ const options: StoreOptions<ArknightsState> = {
       const agentData: CharacterData = ensureCharacterData(state, payload.characterId);
       Vue.set(agentData.planned.skillLevel, payload.skillId, ensureSkillLevel(payload.targetSkillLevel));
       ensurePlannedSkillLevel(agentData, payload.skillId);
+    },
+    [Mutations.DailyMissionFinished]: (state: ArknightsState, index: number) => {
+      const dailyMission = state.missions.daily;
+      const dayString = currentDayString();
+      if (!dailyMission[dayString]) {
+        dailyMission[dayString] = [];
+      }
+      dailyMission[dayString][index] = true;
     },
   },
   actions: {},

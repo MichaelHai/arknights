@@ -26,6 +26,13 @@
       >
         <v-icon>mdi-credit-card</v-icon>
       </v-btn>
+      <v-btn
+        fab
+        small
+        @click.prevent="dailyShopDialog = true"
+      >
+        <v-icon>mdi-calendar-today</v-icon>
+      </v-btn>
     </v-speed-dial>
 
     <v-dialog
@@ -61,6 +68,34 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <v-dialog scrollable v-model="dailyShopDialog">
+      <v-card>
+        <v-card-title>日常</v-card-title>
+        <v-card-text>
+          <v-list>
+            <v-list-item v-for="(items, index) in dailyRewards" :key="index">
+              <v-list-item-content>
+                <v-row>
+                  <v-col cols="6" v-for="item in items" :key="`index_${item.id}`">
+                    <item-avatar :item="item.id" :text="`× ${item.count}`"/>
+                  </v-col>
+                </v-row>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn
+                  small
+                  @click="missionFinished(items, index)"
+                  :disabled="getDailyMissionStats()[index]"
+                >
+                  {{ getDailyMissionStats()[index] ? '已' : '' }}完成
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
@@ -72,11 +107,15 @@
   import ItemSupport from '@/components/mixins/ItemSupport';
   import ItemAvatar from '@/components/ItemAvatar.vue';
   import WarehouseSupport from '@/components/mixins/WarehouseSupport';
+  import MissionSupport from '@/components/mixins/MissionSupport';
+  import {CostItem} from '@/model';
+  import {Mutations} from '@/store';
+  import {currentDayString} from '@/model/Utils';
 
   @Component({
     components: {ItemAvatar, WarehouseList, NumberInput},
   })
-  export default class Warehouse extends mixins(ItemSupport, WarehouseSupport) {
+  export default class Warehouse extends mixins(ItemSupport, WarehouseSupport, MissionSupport) {
     private creditShopDialog: boolean = false;
     private creditShopItemAmount: { [item: string]: number } = {
       '3302': 3,
@@ -95,11 +134,22 @@
       '30061': 1,
     };
 
+    private dailyShopDialog: boolean = false;
+
     private get creditShopItems(): Array<string> {
       return Object.keys(this.creditShopItemAmount)
         .map((item) => this.itemDetail(item))
         .sort((item1, item2) => item1.sortId - item2.sortId)
         .map((item) => item.itemId);
+    }
+
+    private missionFinished(items: Array<CostItem>, index: number) {
+      items.forEach((item) => this.changeItem(item.id, item.count));
+      this.$store.commit(Mutations.DailyMissionFinished, index);
+    }
+
+    private getDailyMissionStats() {
+      return this.$store.state.missions.daily[currentDayString()];
     }
   }
 </script>
