@@ -113,14 +113,29 @@
             </v-card-text>
           </v-card>
         </v-card-text>
+        <v-snackbar v-model="snackbar" :timeout="3000">{{ snackbarMessage }}</v-snackbar>
+        <v-snackbar v-model="compositeSnackbar" :timeout="3000">
+          材料已合成!
+          <v-btn @click.prevent="compositeBonusDialog = true" small text color="success">额外掉落</v-btn>
+        </v-snackbar>
       </v-card>
-      <v-snackbar v-model="snackbar" :timeout="3000">{{ snackbarMessage }}</v-snackbar>
     </v-dialog>
     <loot-dialog
       v-if="lootDialogStage !== null"
       :stage="lootDialogStage"
       v-model="lootDialog"
     />
+    <v-dialog
+      v-model="compositeBonusDialog"
+      scrollable
+    >
+      <v-card>
+        <v-card-title>副产品</v-card-title>
+        <v-card-text>
+          <warehouse-list :items="compositeBonusItems"/>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -135,9 +150,10 @@
   import {mixins} from 'vue-class-component';
   import StageSupport from '@/components/mixins/StageSupport';
   import SkillSupport from '@/components/mixins/SkillSupport';
+  import WarehouseList from '@/components/WarehouseList.vue';
 
   @Component({
-    components: {ItemAvatar, LootDialog, ItemRequirement},
+    components: {WarehouseList, ItemAvatar, LootDialog, ItemRequirement},
   })
   export default class ItemAmountList extends mixins(ItemSupport, StageSupport, SkillSupport) {
     @Prop()
@@ -150,6 +166,9 @@
     private showDialog: boolean = false;
     private mapItems: Array<CostItem> = [];
     private compositeItems: Array<CostItem> = [];
+    private compositeSnackbar: boolean = false;
+    private compositeBonusDialog: boolean = false;
+    private compositeBonusItems: Array<string> = [];
     private snackbar: boolean = false;
     private snackbarMessage: string = '';
     private lootDialog: boolean = false;
@@ -233,6 +252,13 @@
     @Watch('lootDialog')
     private lootDialogChanged() {
       if (!this.lootDialog) {
+        this.calculateSuggestion();
+      }
+    }
+
+    @Watch('compositeBonusDialog')
+    private compositeBonusDialogChanged() {
+      if (!this.compositeBonusDialog) {
         this.calculateSuggestion();
       }
     }
@@ -333,6 +359,8 @@
       });
 
       this.calculateSuggestion();
+      this.compositeSnackbar = true;
+      this.compositeBonusItems = this.AllMaterials.filter((material) => this.itemDetail(material).rarity === this.itemDetail(item.id).rarity - 1);
     }
 
     private checkComposite(item: CostItem): boolean {
