@@ -129,7 +129,7 @@
 
 <script lang="ts">
   import {Component} from 'vue-property-decorator';
-  import {CharacterDetail, Characters, Profession} from '@/model';
+  import {CharacterDetail, Characters, Profession, AllProfessions} from '@/model';
   import {CharacterData, Getters, Mutations} from '@/store';
   import CharacterDetailCard from '@/components/CharacterDetailCard.vue';
   import {mixins} from 'vue-class-component';
@@ -145,11 +145,6 @@
 
     private filterDialog: boolean = false;
 
-    private nameFilter: string = '';
-    private AllProfessions: Array<Profession> = [
-      Profession.PIONEER, Profession.SNIPER, Profession.MEDIC, Profession.CASTER,
-      Profession.WARRIOR, Profession.TANK, Profession.SUPPORT, Profession.SPECIAL,
-    ];
     private ProfessionName: { [profession: string]: string } = {
       PIONEER: '先锋',
       SNIPER: '狙击',
@@ -160,17 +155,33 @@
       SUPPORT: '辅助',
       SPECIAL: '特种',
     };
-    private professionExcluded: { [profession: string]: boolean } = {};
-    private rarityExcluded: Array<boolean> = [];
-    private showNontarget: boolean = false;
 
-    private mounted() {
-      this.AllProfessions.forEach((p) => {
-        this.$set(this.professionExcluded, p, false);
-      });
-      for (let i = 0; i < 6; i++) {
-        this.$set(this.rarityExcluded, i, false);
-      }
+    private get AllProfessions(): Array<Profession> {
+      return AllProfessions;
+    }
+
+    private get nameFilter(): string {
+      return this.$store.state.uiControl.characterFilter.nameFilter;
+    }
+
+    private set nameFilter(name: string) {
+      this.$store.commit(Mutations.SetNameFilter, name);
+    }
+
+    private get professionExcluded(): { [profession: string]: boolean } {
+      return this.$store.state.uiControl.characterFilter.professionExcluded;
+    }
+
+    private get rarityExcluded(): Array<boolean> {
+      return this.$store.state.uiControl.characterFilter.rarityExcluded;
+    }
+
+    private get showNontarget(): boolean {
+      return this.$store.state.uiControl.characterFilter.showNontarget;
+    }
+
+    private set showNontarget(value: boolean) {
+      this.$store.commit(Mutations.SetShowNontarget, value);
     }
 
     private characterData(characterId: string): CharacterData {
@@ -226,35 +237,11 @@
     }
 
     private professionClicked(profession: Profession) {
-      if (Object.values(this.professionExcluded).indexOf(true) < 0) {
-        this.AllProfessions.forEach((p) => {
-          this.professionExcluded[p] = true;
-        });
-        this.professionExcluded[profession] = false;
-      } else {
-        this.professionExcluded[profession] = !this.professionExcluded[profession];
-        if (Object.values(this.professionExcluded).indexOf(false) < 0) {
-          this.AllProfessions.forEach((p) => {
-            this.professionExcluded[p] = false;
-          });
-        }
-      }
+      this.$store.commit(Mutations.ToggleProfessionFilter, profession);
     }
 
     private rarityClicked(rarity: number) {
-      if (this.rarityExcluded.indexOf(true) < 0) {
-        for (let i = 0; i < 6; i++) {
-          this.$set(this.rarityExcluded, i, true);
-        }
-        this.$set(this.rarityExcluded, rarity, false);
-      } else {
-        this.$set(this.rarityExcluded, rarity, !this.rarityExcluded[rarity]);
-        if (this.rarityExcluded.indexOf(false) < 0) {
-          for (let i = 0; i < 6; i++) {
-            this.$set(this.rarityExcluded, i, false);
-          }
-        }
-      }
+      this.$store.commit(Mutations.ToggleRarityFilter, rarity);
     }
   }
 </script>

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex, {Plugin, StoreOptions} from 'vuex';
 import VuexPersist from 'vuex-persist';
-import {CharacterDetail, Characters} from '@/model';
+import {AllProfessions, CharacterDetail, Characters, Profession} from '@/model';
 import {Moment} from 'moment-timezone/moment-timezone';
 
 Vue.use(Vuex);
@@ -16,6 +16,8 @@ const vuexPersist = new VuexPersist<ArknightsState>({
       .forEach((key: keyof ArknightsState) => {
         persisted[key] = state[key];
       });
+    persisted.uiControl = {};
+    persisted.uiControl.characterFilter = state.uiControl.characterFilter;
     return persisted;
   },
 });
@@ -40,6 +42,12 @@ export interface UIControl {
     shown: boolean;
     stage: string | null;
   },
+  characterFilter: {
+    nameFilter: string;
+    professionExcluded: { [profession: string]: boolean };
+    rarityExcluded: Array<boolean>;
+    showNontarget: boolean;
+  }
 }
 
 export interface CharacterData {
@@ -73,6 +81,10 @@ export enum Mutations {
   CloseItemDialog = 'CloseItemDialog',
   OpenLootDialog = 'OpenLootDialog',
   CloseLootDialog = 'CloseLootDialog',
+  SetNameFilter = 'SetNameFilter',
+  SetShowNontarget = 'SetShowNontarget',
+  ToggleProfessionFilter = 'ToggleProfession',
+  ToggleRarityFilter = 'ToggleRarityFilter',
 }
 
 export enum Getters {
@@ -213,6 +225,12 @@ const options: StoreOptions<ArknightsState> = {
         shown: false,
         stage: null,
       },
+      characterFilter: {
+        nameFilter: '',
+        professionExcluded: {},
+        rarityExcluded: [],
+        showNontarget: false,
+      },
     },
   },
   getters: {
@@ -301,6 +319,42 @@ const options: StoreOptions<ArknightsState> = {
     },
     [Mutations.CloseLootDialog]: (state: ArknightsState) => {
       state.uiControl.lootDialog.shown = false;
+    },
+    [Mutations.SetNameFilter]: (state: ArknightsState, name: string) => {
+      state.uiControl.characterFilter.nameFilter = name;
+    },
+    [Mutations.SetShowNontarget]: (state: ArknightsState, showNontarget: boolean) => {
+      state.uiControl.characterFilter.showNontarget = showNontarget;
+    },
+    [Mutations.ToggleProfessionFilter]: (state: ArknightsState, profession: Profession) => {
+      if (Object.values(state.uiControl.characterFilter.professionExcluded).indexOf(true) < 0) {
+        AllProfessions.forEach((p) => {
+          Vue.set(state.uiControl.characterFilter.professionExcluded, p, true);
+        });
+        Vue.set(state.uiControl.characterFilter.professionExcluded, profession, false);
+      } else {
+        Vue.set(state.uiControl.characterFilter.professionExcluded, profession, !state.uiControl.characterFilter.professionExcluded[profession]);
+        if (Object.values(state.uiControl.characterFilter.professionExcluded).indexOf(false) < 0) {
+          AllProfessions.forEach((p) => {
+            Vue.set(state.uiControl.characterFilter.professionExcluded, p, false);
+          });
+        }
+      }
+    },
+    [Mutations.ToggleRarityFilter]: (state: ArknightsState, rarity: number) => {
+      if (state.uiControl.characterFilter.rarityExcluded.indexOf(true) < 0) {
+        for (let i = 0; i < 6; i++) {
+          Vue.set(state.uiControl.characterFilter.rarityExcluded, i, true);
+        }
+        Vue.set(state.uiControl.characterFilter.rarityExcluded, rarity, false);
+      } else {
+        Vue.set(state.uiControl.characterFilter.rarityExcluded, rarity, !state.uiControl.characterFilter.rarityExcluded[rarity]);
+        if (state.uiControl.characterFilter.rarityExcluded.indexOf(false) < 0) {
+          for (let i = 0; i < 6; i++) {
+            Vue.set(state.uiControl.characterFilter.rarityExcluded, i, false);
+          }
+        }
+      }
     },
   },
   actions: {},

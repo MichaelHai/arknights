@@ -115,3 +115,8 @@ export enum LevelUpType {
 export const Characters: { [id: string]: CharacterDetail } = CharacterTable as { [id: string]: CharacterDetail };
 
 export const Skills: { [id: string]: SkillDetail } = SkillTable as { [id: string]: SkillDetail };
+
+export const AllProfessions: Array<Profession> = [
+  Profession.PIONEER, Profession.SNIPER, Profession.MEDIC, Profession.CASTER,
+  Profession.WARRIOR, Profession.TANK, Profession.SUPPORT, Profession.SPECIAL,
+];
