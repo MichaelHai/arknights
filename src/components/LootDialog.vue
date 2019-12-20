@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialogShown">
+  <v-dialog v-model="shown">
     <v-card>
       <v-card-title>{{ getStageDetail(stage).code }}</v-card-title>
       <v-card-text class="px-2">
@@ -14,26 +14,30 @@
   import WarehouseList from '@/components/WarehouseList.vue';
   import {mixins} from 'vue-class-component';
   import StageSupport from '@/components/mixins/StageSupport';
+  import {Mutations} from '@/store';
 
   @Component({
     components: {WarehouseList},
   })
   export default class LootDialog extends mixins(StageSupport) {
-    @Prop()
-    public stage!: string;
-    @Model('input')
-    public value!: boolean;
-
-    private get dialogShown(): boolean {
-      return this.value;
+    public get stage(): string | null {
+      return this.$store.state.uiControl.lootDialog.stage;
     }
 
-    private set dialogShown(shown: boolean) {
-      this.$emit('input', shown);
+    public get shown(): boolean {
+      return this.$store.state.uiControl.lootDialog.shown;
+    }
+
+    public set shown(shown: boolean) {
+      this.$store.commit(Mutations.CloseLootDialog);
     }
 
     private get stageItems(): Array<string> {
-      return this.getStageMaterialRewards(this.stage);
+      if (this.stage) {
+        return this.getStageMaterialRewards(this.stage);
+      } else {
+        return [];
+      }
     }
   }
 </script>

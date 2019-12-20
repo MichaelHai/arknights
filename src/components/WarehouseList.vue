@@ -3,9 +3,7 @@
     <v-col v-for="item in items" :key="item" cols="6">
       <v-row dense>
         <v-col cols="4">
-          <v-avatar>
-            <img :alt="itemDetail(item).name" :src="itemIcon(item)"/>
-          </v-avatar>
+          <item-avatar :item="item"/>
         </v-col>
         <v-col>
           <number-input
@@ -28,9 +26,10 @@
   import {mixins} from 'vue-class-component';
   import ItemSupport from '@/components/mixins/ItemSupport';
   import WarehouseSupport from '@/components/mixins/WarehouseSupport';
+  import ItemAvatar from '@/components/ItemAvatar.vue';
 
   @Component({
-    components: {NumberInput},
+    components: {ItemAvatar, NumberInput},
   })
   export default class WarehouseList extends mixins(ItemSupport, WarehouseSupport) {
     @Prop()

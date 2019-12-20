@@ -1,12 +1,7 @@
 <template>
   <v-row dense :class="{'green--text': warehouseAmount(item.id) >= item.count}">
     <v-col cols="5">
-      <v-avatar size="40">
-        <img
-          :src="itemIcon(item.id)"
-          :alt="itemDetail(item.id).name"
-        />
-      </v-avatar>
+      <item-avatar :item="item.id" :size="40"/>
     </v-col>
     <v-col cols="7" class="itemCount ma-auto">
       <v-row dense class="itemName">{{ itemDetail(item.id).name }}</v-row>
@@ -21,8 +16,10 @@
   import ItemSupport from '@/components/mixins/ItemSupport';
   import {mixins} from 'vue-class-component';
   import WarehouseSupport from '@/components/mixins/WarehouseSupport';
-
-  @Component
+  import ItemAvatar from '@/components/ItemAvatar.vue';
+  @Component({
+    components: {ItemAvatar},
+  })
   export default class ItemRequirement extends mixins(ItemSupport, WarehouseSupport) {
     @Prop()
     public item!: CostItem;

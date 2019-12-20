@@ -29,13 +29,18 @@
         <v-icon>mdi-warehouse</v-icon>
       </v-btn>
     </v-bottom-navigation>
+    <item-dialog/>
+    <loot-dialog/>
   </v-app>
 </template>
 
 <script lang="ts">
   import {Component, Vue} from 'vue-property-decorator';
-
-  @Component
+  import ItemDialog from '@/components/ItemDialog.vue';
+  import LootDialog from '@/components/LootDialog.vue';
+  @Component({
+    components: {LootDialog, ItemDialog},
+  })
   export default class App extends Vue {
   }
 </script>

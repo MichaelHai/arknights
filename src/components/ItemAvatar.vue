@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div @click.prevent.stop="openItemDialog">
     <v-row dense justify="center">
-      <v-avatar>
+      <v-avatar :size="size">
         <img :src="itemIcon(item)" :alt="itemDetail(item).name"/>
       </v-avatar>
     </v-row>
@@ -19,6 +19,7 @@
   import {Component, Prop, Vue} from 'vue-property-decorator';
   import {mixins} from 'vue-class-component';
   import ItemSupport from '@/components/mixins/ItemSupport';
+  import {Mutations} from '@/store';
 
   @Component
   export default class ItemAvatar extends mixins(ItemSupport) {
@@ -26,5 +27,11 @@
     public item!: string;
     @Prop()
     public text!: string;
+    @Prop()
+    public size!: number;
+
+    private openItemDialog() {
+      this.$store.commit(Mutations.OpenItemDialog, this.item);
+    }
   }
 </script>

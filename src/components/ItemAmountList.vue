@@ -12,7 +12,7 @@
         </v-row>
       </v-col>
     </v-row>
-    <v-dialog v-model="showDialog" scrollable fullscreen hide-overlay transition="dialog-bottom-transition">
+    <v-dialog v-model="showDialog" scrollable fullscreen hide-overlay transition="dialog-bottom-transition" persistent no-click-animation>
       <v-card>
         <v-toolbar dense absolute width="100%">
           <v-btn icon @click="showDialog = false">
@@ -80,33 +80,10 @@
               <v-list dense>
                 <v-list-item v-for="item in compositeItems" :key="`shortage_${item.id}`" dense class="pa-0">
                   <v-list-item-content>
-                    <v-row dense justify="center">
-                      <v-col cols="2">
-                        <item-avatar
-                          :item="item.id"
-                          :text="`× ${item.count}`"
-                        />
-                      </v-col>
-                      <v-col cols="1" class="ma-auto">
-                        <span>=</span>
-                      </v-col>
-                      <v-col
-                        v-for="compositeItem in getCompositeItems(item.id)"
-                        :key="`composite_${item.id}_${compositeItem.id}`"
-                        cols="2"
-                      >
-                        <item-avatar
-                          :class="compositeClass(compositeItem, item.count)"
-                          :item="compositeItem.id"
-                          :text="`${compositeItem.count} / ${ getItemAmountInWarehouse(compositeItem.id) }`"
-                        />
-                      </v-col>
-                      <v-spacer/>
-                      <v-col cols="3" class="text-end">
-                        <v-btn small tile class="ma-1" @click="compositeOne(item.id)">合成</v-btn>
-                        <v-btn small tile class="ma-1" @click="composite(item)"> 全部</v-btn>
-                      </v-col>
-                    </v-row>
+                    <composite-formula
+                      :item="item.id"
+                      :count="item.count"
+                    />
                   </v-list-item-content>
                 </v-list-item>
               </v-list>
@@ -114,26 +91,6 @@
           </v-card>
         </v-card-text>
         <v-snackbar v-model="snackbar" :timeout="3000">{{ snackbarMessage }}</v-snackbar>
-        <v-snackbar v-model="compositeSnackbar" :timeout="3000">
-          材料已合成!
-          <v-btn @click.prevent="compositeBonusDialog = true" small text color="success">额外掉落</v-btn>
-        </v-snackbar>
-      </v-card>
-    </v-dialog>
-    <loot-dialog
-      v-if="lootDialogStage !== null"
-      :stage="lootDialogStage"
-      v-model="lootDialog"
-    />
-    <v-dialog
-      v-model="compositeBonusDialog"
-      scrollable
-    >
-      <v-card>
-        <v-card-title>副产品</v-card-title>
-        <v-card-text>
-          <warehouse-list :items="compositeBonusItems"/>
-        </v-card-text>
       </v-card>
     </v-dialog>
   </div>
@@ -143,7 +100,6 @@
   import {Component, Prop, Watch} from 'vue-property-decorator';
   import {CostItem, LevelUp, LevelUpType} from '@/model';
   import ItemRequirement from '@/components/ItemRequirement.vue';
-  import LootDialog from '@/components/LootDialog.vue';
   import ItemAvatar from '@/components/ItemAvatar.vue';
   import {CharacterData, Getters, Mutations} from '@/store';
   import ItemSupport from '@/components/mixins/ItemSupport';
@@ -151,9 +107,10 @@
   import StageSupport from '@/components/mixins/StageSupport';
   import SkillSupport from '@/components/mixins/SkillSupport';
   import WarehouseList from '@/components/WarehouseList.vue';
+  import CompositeFormula from '@/components/CompositeFormula.vue';
 
   @Component({
-    components: {WarehouseList, ItemAvatar, LootDialog, ItemRequirement},
+    components: {CompositeFormula, WarehouseList, ItemAvatar, ItemRequirement},
   })
   export default class ItemAmountList extends mixins(ItemSupport, StageSupport, SkillSupport) {
     @Prop()
@@ -166,13 +123,8 @@
     private showDialog: boolean = false;
     private mapItems: Array<CostItem> = [];
     private compositeItems: Array<CostItem> = [];
-    private compositeSnackbar: boolean = false;
-    private compositeBonusDialog: boolean = false;
-    private compositeBonusItems: Array<string> = [];
     private snackbar: boolean = false;
     private snackbarMessage: string = '';
-    private lootDialog: boolean = false;
-    private lootDialogStage: string | null = null;
 
     private get warehouseItemCounts(): { [item: string]: number } {
       return this.$store.state.itemCounts;
@@ -188,6 +140,11 @@
       }
     }
 
+    private get warehouse() {
+      return this.$store.state.itemCounts;
+    }
+
+    @Watch('warehouse', {deep: true})
     private calculateSuggestion() {
       this.mapItems = [];
       this.compositeItems = [];
@@ -245,22 +202,7 @@
     }
 
     private mapClicked(map: string) {
-      this.lootDialog = true;
-      this.lootDialogStage = map;
-    }
-
-    @Watch('lootDialog')
-    private lootDialogChanged() {
-      if (!this.lootDialog) {
-        this.calculateSuggestion();
-      }
-    }
-
-    @Watch('compositeBonusDialog')
-    private compositeBonusDialogChanged() {
-      if (!this.compositeBonusDialog) {
-        this.calculateSuggestion();
-      }
+      this.$store.commit(Mutations.OpenLootDialog, map);
     }
 
     private doLevelUp() {
@@ -342,53 +284,8 @@
       return false;
     }
 
-    private compositeOne(id: string) {
-      this.composite({id, count: 1});
-    }
-
-    private composite(item: CostItem) {
-      const canComposite = this.checkComposite(item);
-
-      if (!canComposite) {
-        this.snackbar = true;
-        return;
-      }
-      this.$store.commit(Mutations.ChangeItem, {item: item.id, amount: item.count});
-      this.getCompositeItems(item.id).forEach((toComposite) => {
-        this.$store.commit(Mutations.ChangeItem, {item: toComposite.id, amount: -item.count * toComposite.count});
-      });
-
-      this.calculateSuggestion();
-      this.compositeSnackbar = true;
-      this.compositeBonusItems = this.AllMaterials.filter((material) => this.itemDetail(material).rarity === this.itemDetail(item.id).rarity - 1);
-    }
-
-    private checkComposite(item: CostItem): boolean {
-      if (this.getCompositeItems(item.id)) {
-        const compositeItems: Array<CostItem> = this.getCompositeItems(item.id);
-        const isItemEnough = compositeItems.filter((toComposite) => {
-          return (this.getItemAmountInWarehouse(toComposite.id)) < (toComposite.count * item.count);
-        }).length === 0;
-        if (!isItemEnough) {
-          this.snackbarMessage = '材料不足';
-        }
-        return isItemEnough;
-      } else {
-        this.snackbarMessage = '无法合成';
-        return false;
-      }
-    }
-
     private getItemAmountInWarehouse(item: string) {
       return this.warehouseItemCounts[item] || 0;
-    }
-
-    private compositeClass(compositeItem: CostItem, itemCount: number): { [className: string]: boolean } {
-      const warehouseAmount = this.getItemAmountInWarehouse(compositeItem.id);
-      return {
-        'red--text': compositeItem.count > warehouseAmount,
-        'green--text': compositeItem.count * itemCount <= warehouseAmount,
-      };
     }
   }
 </script>

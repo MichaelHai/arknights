@@ -6,9 +6,18 @@ import {Moment} from 'moment-timezone/moment-timezone';
 
 Vue.use(Vuex);
 
-const vuexPersist = new VuexPersist({
+const vuexPersist = new VuexPersist<ArknightsState>({
   key: 'arknights',
   storage: window.localStorage,
+  reducer: (state) => {
+    const persisted: { [key: string]: any } = {};
+    (Object.keys(state) as Array<keyof ArknightsState>)
+      .filter((key: keyof ArknightsState) => key !== 'uiControl')
+      .forEach((key: keyof ArknightsState) => {
+        persisted[key] = state[key];
+      });
+    return persisted;
+  },
 });
 
 export interface ArknightsState {
@@ -19,6 +28,18 @@ export interface ArknightsState {
     daily: { [day: string]: Array<boolean> }
   };
   checkin: { [day: string]: boolean };
+  uiControl: UIControl;
+}
+
+export interface UIControl {
+  itemDialog: {
+    shown: boolean;
+    item: string | null;
+  },
+  lootDialog: {
+    shown: boolean;
+    stage: string | null;
+  },
 }
 
 export interface CharacterData {
@@ -48,6 +69,10 @@ export enum Mutations {
   SetPlannedSkillLevel = 'SetPlannedSkillLevel',
   DailyMissionFinished = 'DailyMissionFinished',
   Checkin = 'Checkin',
+  OpenItemDialog = 'OpenItemDialog',
+  CloseItemDialog = 'CloseItemDialog',
+  OpenLootDialog = 'OpenLootDialog',
+  CloseLootDialog = 'CloseLootDialog',
 }
 
 export enum Getters {
@@ -179,6 +204,16 @@ const options: StoreOptions<ArknightsState> = {
       daily: {},
     },
     checkin: {},
+    uiControl: {
+      itemDialog: {
+        shown: false,
+        item: null,
+      },
+      lootDialog: {
+        shown: false,
+        stage: null,
+      },
+    },
   },
   getters: {
     [Getters.CharacterData]: (state) => (agent: string) => {
@@ -252,6 +287,20 @@ const options: StoreOptions<ArknightsState> = {
     },
     [Mutations.Checkin]: (state: ArknightsState, day: Moment) => {
       Vue.set(state.checkin, toDayString(day), true);
+    },
+    [Mutations.OpenItemDialog]: (state: ArknightsState, item: string) => {
+      state.uiControl.itemDialog.shown = true;
+      state.uiControl.itemDialog.item = item;
+    },
+    [Mutations.CloseItemDialog]: (state: ArknightsState) => {
+      state.uiControl.itemDialog.shown = false;
+    },
+    [Mutations.OpenLootDialog]: (state: ArknightsState, stage: string) => {
+      state.uiControl.lootDialog.shown = true;
+      state.uiControl.lootDialog.stage = stage;
+    },
+    [Mutations.CloseLootDialog]: (state: ArknightsState) => {
+      state.uiControl.lootDialog.shown = false;
     },
   },
   actions: {},
