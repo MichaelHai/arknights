@@ -3,6 +3,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {CostItem, ItemType} from '@/model';
 import {mixins} from 'vue-class-component';
 import ItemSupport from '@/components/mixins/ItemSupport';
+import {Moment} from 'moment-timezone/moment-timezone';
 
 @Component
 export default class MissionSupport extends mixins(ItemSupport) {
@@ -14,12 +15,11 @@ export default class MissionSupport extends mixins(ItemSupport) {
     return MissionTable.periodicalRewards as { [id: string]: PeriodicalRewards };
   }
 
-  protected get dailyRewards(): Array<Array<CostItem>> {
-    const currentDate = new Date();
-    const currentEpoch = currentDate.getTime() / 1000;
-    const dailyMissionPeriodInfo = this.dailyMissionPeriodInfos.find((info) => info.startTime <= currentEpoch && info.endTime >= currentEpoch);
+  protected getDailyRewards(day: Moment): Array<Array<CostItem>> {
+    const epoch = day.toDate().getTime() / 1000;
+    const dailyMissionPeriodInfo = this.dailyMissionPeriodInfos.find((info) => info.startTime <= epoch && info.endTime >= epoch);
     if (dailyMissionPeriodInfo) {
-      const currentDay: Period = new Date(currentDate.getTime() - 4 * 60 * 60 * 1000).getDay() as Period;
+      const currentDay: Period = day.weekday() as Period;
       const dailyMissionRewardPeriod = dailyMissionPeriodInfo.periodList.find((period) => period.period.indexOf(currentDay) >= 0);
       if (dailyMissionRewardPeriod) {
         const rewardGroupId = dailyMissionRewardPeriod.rewardGroupId;

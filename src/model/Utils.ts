@@ -1,6 +1,7 @@
 import {CharacterData} from '@/store';
 import _ from 'lodash';
-import {Skills} from '@/model/index';
+import moment from 'moment-timezone';
+import {Moment} from 'moment-timezone/moment-timezone';
 
 export function targetAchieved(agentData: CharacterData) {
   const current = {
@@ -12,7 +13,6 @@ export function targetAchieved(agentData: CharacterData) {
   return _.isEqual(current, agentData.planned);
 }
 
-export function currentDayString() {
-  const currentDate = new Date();
-  return new Date(currentDate.getTime() - 4 * 60 * 60 * 1000).toLocaleDateString();
+export function currentDay(): Moment {
+  return moment(new Date().getTime() - 4 * 60 * 60 * 1000).tz('Asia/Shanghai');
 }

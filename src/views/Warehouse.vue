@@ -29,7 +29,7 @@
       <v-btn
         fab
         small
-        @click.prevent="dailyShopDialog = true"
+        @click.prevent="openDailyMissionDialog"
       >
         <v-icon>mdi-calendar-today</v-icon>
       </v-btn>
@@ -109,8 +109,9 @@
   import WarehouseSupport from '@/components/mixins/WarehouseSupport';
   import MissionSupport from '@/components/mixins/MissionSupport';
   import {CostItem} from '@/model';
-  import {Mutations} from '@/store';
-  import {currentDayString} from '@/model/Utils';
+  import {Getters, Mutations} from '@/store';
+  import {currentDay} from '@/model/Utils';
+  import {Moment} from 'moment-timezone/moment-timezone';
 
   @Component({
     components: {ItemAvatar, WarehouseList, NumberInput},
@@ -135,6 +136,7 @@
     };
 
     private dailyShopDialog: boolean = false;
+    private dailyShopDialogDay: Moment = currentDay();
 
     private get creditShopItems(): Array<string> {
       return Object.keys(this.creditShopItemAmount)
@@ -145,11 +147,23 @@
 
     private missionFinished(items: Array<CostItem>, index: number) {
       items.forEach((item) => this.changeItem(item.id, item.count));
-      this.$store.commit(Mutations.DailyMissionFinished, index);
+      this.$store.commit(Mutations.DailyMissionFinished, {
+        day: this.dailyShopDialogDay,
+        index,
+      });
     }
 
     private getDailyMissionStats() {
-      return this.$store.state.missions.daily[currentDayString()] || [];
+      return this.$store.getters[Getters.DailyMission](this.dailyShopDialogDay);
+    }
+
+    private get dailyRewards(): Array<Array<CostItem>> {
+      return this.getDailyRewards(this.dailyShopDialogDay);
+    }
+
+    private openDailyMissionDialog() {
+      this.dailyShopDialogDay = currentDay();
+      this.dailyShopDialog = true;
     }
   }
 </script>

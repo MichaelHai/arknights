@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex, {Plugin, StoreOptions} from 'vuex';
 import VuexPersist from 'vuex-persist';
 import {CharacterDetail, Characters} from '@/model';
-import {currentDayString} from '@/model/Utils';
+import {Moment} from 'moment-timezone/moment-timezone';
 
 Vue.use(Vuex);
 
@@ -50,6 +50,7 @@ export enum Mutations {
 
 export enum Getters {
   CharacterData = 'AgentData',
+  DailyMission = 'DailyMission',
 }
 
 export interface ItemChangePayload {
@@ -76,6 +77,11 @@ export interface SetSpecializeRankPayload {
 export type AllSkillLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type PhaseLevel = 0 | 1 | 2;
+
+export interface DailyMissionFinishedPayload {
+  index: number;
+  day: Moment;
+}
 
 function createSkillLevel(skills: Array<string>) {
   return skills.reduce((result: { [skillId: string]: SkillLevel }, current) => {
@@ -157,6 +163,10 @@ function ensurePlannedSkillLevel(characterData: CharacterData, skillId: string) 
   }
 }
 
+function toDayString(day: Moment) {
+  return `${day.year()}${day.month()}${day.date()}`;
+}
+
 const options: StoreOptions<ArknightsState> = {
   state: {
     itemCounts: {},
@@ -174,6 +184,9 @@ const options: StoreOptions<ArknightsState> = {
       }
 
       return characterData;
+    },
+    [Getters.DailyMission]: (state) => (day: Moment) => {
+      return state.missions.daily[toDayString(day)] || [];
     },
   },
   mutations: {
@@ -222,13 +235,13 @@ const options: StoreOptions<ArknightsState> = {
       Vue.set(agentData.planned.skillLevel, payload.skillId, ensureSkillLevel(payload.targetSkillLevel));
       ensurePlannedSkillLevel(agentData, payload.skillId);
     },
-    [Mutations.DailyMissionFinished]: (state: ArknightsState, index: number) => {
+    [Mutations.DailyMissionFinished]: (state: ArknightsState, payload: DailyMissionFinishedPayload) => {
       const dailyMission = state.missions.daily;
-      const dayString = currentDayString();
+      const dayString = toDayString(payload.day);
       if (!dailyMission[dayString]) {
         dailyMission[dayString] = [];
       }
-      dailyMission[dayString][index] = true;
+      dailyMission[dayString][payload.index] = true;
     },
   },
   actions: {},
