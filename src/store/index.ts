@@ -17,7 +17,8 @@ export interface ArknightsState {
   homeCharacterId: string | null;
   missions: {
     daily: { [day: string]: Array<boolean> }
-  }
+  };
+  checkin: { [day: string]: boolean };
 }
 
 export interface CharacterData {
@@ -46,11 +47,13 @@ export enum Mutations {
   SetSkillLevel = 'SetSkillLevel',
   SetPlannedSkillLevel = 'SetPlannedSkillLevel',
   DailyMissionFinished = 'DailyMissionFinished',
+  Checkin = 'Checkin',
 }
 
 export enum Getters {
   CharacterData = 'AgentData',
   DailyMission = 'DailyMission',
+  Checkin = 'Checkin',
 }
 
 export interface ItemChangePayload {
@@ -175,6 +178,7 @@ const options: StoreOptions<ArknightsState> = {
     missions: {
       daily: {},
     },
+    checkin: {},
   },
   getters: {
     [Getters.CharacterData]: (state) => (agent: string) => {
@@ -187,6 +191,9 @@ const options: StoreOptions<ArknightsState> = {
     },
     [Getters.DailyMission]: (state) => (day: Moment) => {
       return state.missions.daily[toDayString(day)] || [];
+    },
+    [Getters.Checkin]: (state) => (day: Moment) => {
+      return state.checkin[toDayString(day)] || false;
     },
   },
   mutations: {
@@ -242,6 +249,9 @@ const options: StoreOptions<ArknightsState> = {
         dailyMission[dayString] = [];
       }
       dailyMission[dayString][payload.index] = true;
+    },
+    [Mutations.Checkin]: (state: ArknightsState, day: Moment) => {
+      Vue.set(state.checkin, toDayString(day), true);
     },
   },
   actions: {},

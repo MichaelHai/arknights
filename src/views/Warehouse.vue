@@ -69,7 +69,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog scrollable v-model="dailyShopDialog">
+    <v-dialog scrollable v-model="dailyDialog">
       <v-card>
         <v-card-title>日常</v-card-title>
         <v-card-text>
@@ -89,6 +89,22 @@
                   :disabled="getDailyMissionStats()[index]"
                 >
                   {{ getDailyMissionStats()[index] ? '已' : '' }}完成
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+            <v-list-item v-if="checkinItem">
+              <v-list-item-content>
+                <v-col cols="6">
+                  <item-avatar :item="checkinItem.id" :text="`× ${checkinItem.count}`"/>
+                </v-col>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn
+                  small
+                  @click="checkin(checkinItem)"
+                  :disabled="checkinStat"
+                >
+                  {{ checkinStat ? '已' : '' }}签到
                 </v-btn>
               </v-list-item-action>
             </v-list-item>
@@ -112,11 +128,12 @@
   import {Getters, Mutations} from '@/store';
   import {currentDay} from '@/model/Utils';
   import {Moment} from 'moment-timezone/moment-timezone';
+  import CheckinSupport from '@/components/mixins/CheckinSupport';
 
   @Component({
     components: {ItemAvatar, WarehouseList, NumberInput},
   })
-  export default class Warehouse extends mixins(ItemSupport, WarehouseSupport, MissionSupport) {
+  export default class Warehouse extends mixins(ItemSupport, WarehouseSupport, MissionSupport, CheckinSupport) {
     private creditShopDialog: boolean = false;
     private creditShopItemAmount: { [item: string]: number } = {
       '3302': 3,
@@ -135,8 +152,8 @@
       '30061': 1,
     };
 
-    private dailyShopDialog: boolean = false;
-    private dailyShopDialogDay: Moment = currentDay();
+    private dailyDialog: boolean = false;
+    private dailyDialogDay: Moment = currentDay();
 
     private get creditShopItems(): Array<string> {
       return Object.keys(this.creditShopItemAmount)
@@ -148,22 +165,40 @@
     private missionFinished(items: Array<CostItem>, index: number) {
       items.forEach((item) => this.changeItem(item.id, item.count));
       this.$store.commit(Mutations.DailyMissionFinished, {
-        day: this.dailyShopDialogDay,
+        day: this.dailyDialogDay,
         index,
       });
     }
 
     private getDailyMissionStats() {
-      return this.$store.getters[Getters.DailyMission](this.dailyShopDialogDay);
+      return this.$store.getters[Getters.DailyMission](this.dailyDialogDay);
     }
 
     private get dailyRewards(): Array<Array<CostItem>> {
-      return this.getDailyRewards(this.dailyShopDialogDay);
+      return this.getDailyRewards(this.dailyDialogDay);
     }
 
     private openDailyMissionDialog() {
-      this.dailyShopDialogDay = currentDay();
-      this.dailyShopDialog = true;
+      this.dailyDialogDay = currentDay();
+      this.dailyDialog = true;
+    }
+
+    private get checkinItem(): CostItem | null {
+      const item = this.getCheckin(this.dailyDialogDay);
+      if (item && this.AllMaterials.indexOf(item.id) >= 0) {
+        return item;
+      } else {
+        return null;
+      }
+    }
+
+    private get checkinStat(): boolean {
+      return this.$store.getters[Getters.Checkin](this.dailyDialogDay);
+    }
+
+    private checkin(item: CostItem) {
+      this.changeItem(item.id, item.count);
+      this.$store.commit(Mutations.Checkin, this.dailyDialogDay);
     }
   }
 </script>

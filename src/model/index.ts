@@ -1,6 +1,5 @@
 import {AllSkillLevel, PhaseLevel, SkillLevel} from '@/store';
 import CharacterTable from '@/assets/ArknightsGameData/excel/character_table.json';
-import ItemTable from '@/assets/ArknightsGameData/excel/item_table.json';
 import SkillTable from '@/assets/ArknightsGameData/excel/skill_table.json';
 
 export interface SkillDetail {
@@ -47,11 +46,7 @@ export interface Phase {
 export interface CostItem {
   id: string;
   count: number;
-  type?: CostType;
-}
-
-enum CostType {
-  MATERIAL = 'MATERIAL',
+  type?: ItemType;
 }
 
 export enum Profession {
