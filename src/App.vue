@@ -21,7 +21,7 @@
         <v-icon>mdi-home</v-icon>
       </v-btn>
       <v-btn to="/planner">
-        <span>规划</span>
+        <span>干员</span>
         <v-icon>mdi-clipboard-list</v-icon>
       </v-btn>
       <v-btn to="/warehouse">

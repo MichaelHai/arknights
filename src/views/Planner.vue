@@ -1,5 +1,64 @@
 <template>
   <div>
+    <v-dialog scrollable v-model="filterDialog">
+      <v-card>
+        <v-card-title>干员筛选</v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col cols="3" class="my-auto">代号</v-col>
+            <v-col cols="9">
+              <v-text-field
+                v-model="nameFilter"
+                prepend-inner-icon="mdi-account-search"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="3" class="my-auto ">职业</v-col>
+            <v-col cols="9">
+              <v-row>
+                <v-col cols="3" v-for="profession in AllProfessions" :key="profession">
+                  <v-btn :outlined="professionExcluded[profession]" @click="professionClicked(profession)" small>
+                    {{ ProfessionName[profession] }}
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="3" class="my-auto">稀有度</v-col>
+            <v-col>
+              <v-row>
+                <v-col cols="3" v-for="rarity in 6" :key="rarity">
+                  <v-btn :outlined="rarityExcluded[rarity - 1]" @click="rarityClicked(rarity - 1)" small>
+                    {{ rarity }}星
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="3" class="my-auto">非目标</v-col>
+            <v-col>
+              <v-switch v-model="showNontarget"/>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-btn
+      fab
+      color="red"
+      bottom
+      right
+      fixed
+      @click.prevent="filterDialog = true"
+      class="filterButton"
+    >
+      <v-icon>mdi-filter</v-icon>
+    </v-btn>
+
     <v-list dense>
       <v-list-item
         v-for="characterId in characters"
@@ -84,6 +143,36 @@
     private isBottomSheetShow: boolean = false;
     private characterShownInBottomSheet: string | null = null;
 
+    private filterDialog: boolean = false;
+
+    private nameFilter: string = '';
+    private AllProfessions: Array<Profession> = [
+      Profession.PIONEER, Profession.SNIPER, Profession.MEDIC, Profession.CASTER,
+      Profession.WARRIOR, Profession.TANK, Profession.SUPPORT, Profession.SPECIAL,
+    ];
+    private ProfessionName: { [profession: string]: string } = {
+      PIONEER: '先锋',
+      SNIPER: '狙击',
+      MEDIC: '医疗',
+      CASTER: '术师',
+      WARRIOR: '近卫',
+      TANK: '重装',
+      SUPPORT: '辅助',
+      SPECIAL: '特种',
+    };
+    private professionExcluded: { [profession: string]: boolean } = {};
+    private rarityExcluded: Array<boolean> = [];
+    private showNontarget: boolean = false;
+
+    private mounted() {
+      this.AllProfessions.forEach((p) => {
+        this.$set(this.professionExcluded, p, false);
+      });
+      for (let i = 0; i < 6; i++) {
+        this.$set(this.rarityExcluded, i, false);
+      }
+    }
+
     private characterData(characterId: string): CharacterData {
       return this.$store.getters[Getters.CharacterData](characterId);
     }
@@ -96,7 +185,19 @@
       return Object.keys(Characters)
         .filter((c) => Characters[c].profession !== Profession.TOKEN)
         .filter((c) => Characters[c].profession !== Profession.TRAP)
-        .sort((c1, c2) => Characters[c2].rarity - Characters[c1].rarity);
+        .filter((c) => !this.professionExcluded[Characters[c].profession])
+        .filter((c) => !this.rarityExcluded[Characters[c].rarity])
+        .filter((c) => Characters[c].name.includes(this.nameFilter) || Characters[c].appellation.includes(this.nameFilter))
+        .filter((c) => this.showNontarget || !this.targetAchieved(c))
+        .sort((c1, c2) => {
+          if (this.targetAchieved(c1) && !this.targetAchieved(c2)) {
+            return 1;
+          } else if (!this.targetAchieved(c1) && this.targetAchieved(c2)) {
+            return -1;
+          } else {
+            return Characters[c2].rarity - Characters[c1].rarity;
+          }
+        });
     }
 
     protected homeClicked(characterId: string): void {
@@ -123,6 +224,38 @@
     private characterDetail(characterId: string): CharacterDetail {
       return Characters[characterId];
     }
+
+    private professionClicked(profession: Profession) {
+      if (Object.values(this.professionExcluded).indexOf(true) < 0) {
+        this.AllProfessions.forEach((p) => {
+          this.professionExcluded[p] = true;
+        });
+        this.professionExcluded[profession] = false;
+      } else {
+        this.professionExcluded[profession] = !this.professionExcluded[profession];
+        if (Object.values(this.professionExcluded).indexOf(false) < 0) {
+          this.AllProfessions.forEach((p) => {
+            this.professionExcluded[p] = false;
+          });
+        }
+      }
+    }
+
+    private rarityClicked(rarity: number) {
+      if (this.rarityExcluded.indexOf(true) < 0) {
+        for (let i = 0; i < 6; i++) {
+          this.$set(this.rarityExcluded, i, true);
+        }
+        this.$set(this.rarityExcluded, rarity, false);
+      } else {
+        this.$set(this.rarityExcluded, rarity, !this.rarityExcluded[rarity]);
+        if (this.rarityExcluded.indexOf(false) < 0) {
+          for (let i = 0; i < 6; i++) {
+            this.$set(this.rarityExcluded, i, false);
+          }
+        }
+      }
+    }
   }
 </script>
 
@@ -146,5 +279,9 @@
     font-size: 16px;
     margin-top: 12px;
     margin-left: 20px;
+  }
+
+  .filterButton {
+    margin-bottom: 56px;
   }
 </style>

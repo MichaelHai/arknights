@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="shown">
-    <v-card>
+    <v-card v-if="stage">
       <v-card-title>{{ getStageDetail(stage).code }}</v-card-title>
       <v-card-text class="px-2">
         <warehouse-list :items="stageItems"/>

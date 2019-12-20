@@ -50,8 +50,14 @@ export interface CostItem {
 }
 
 export enum Profession {
+  PIONEER = 'PIONEER',
   SNIPER = 'SNIPER',
+  MEDIC = 'MEDIC',
   CASTER = 'CASTER',
+  WARRIOR = 'WARRIOR',
+  TANK = 'TANK',
+  SUPPORT = 'SUPPORT',
+  SPECIAL = 'SPECIAL',
   TOKEN = 'TOKEN',
   TRAP = 'TRAP',
 }
