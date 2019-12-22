@@ -19,8 +19,11 @@ export default class MissionSupport extends mixins(ItemSupport) {
     const epoch = day.toDate().getTime() / 1000;
     const dailyMissionPeriodInfo = this.dailyMissionPeriodInfos.find((info) => info.startTime <= epoch && info.endTime >= epoch);
     if (dailyMissionPeriodInfo) {
-      const currentDay: Period = day.weekday() as Period;
-      const dailyMissionRewardPeriod = dailyMissionPeriodInfo.periodList.find((period) => period.period.indexOf(currentDay) >= 0);
+      let currentDay: number = day.weekday();
+      if (currentDay === 0) {
+        currentDay = 7;
+      }
+      const dailyMissionRewardPeriod = dailyMissionPeriodInfo.periodList.find((period) => period.period.indexOf(currentDay as Period) >= 0);
       if (dailyMissionRewardPeriod) {
         const rewardGroupId = dailyMissionRewardPeriod.rewardGroupId;
         return Object.values(this.periodicalRewards)
