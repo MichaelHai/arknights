@@ -69,49 +69,11 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog scrollable v-model="dailyDialog">
-      <v-card>
-        <v-card-title>日常</v-card-title>
-        <v-card-text>
-          <v-list>
-            <v-list-item v-for="(items, index) in dailyRewards" :key="index">
-              <v-list-item-content>
-                <v-row>
-                  <v-col cols="6" v-for="item in items" :key="`index_${item.id}`">
-                    <item-avatar :item="item.id" :text="`× ${item.count}`"/>
-                  </v-col>
-                </v-row>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn
-                  small
-                  @click="missionFinished(items, index)"
-                  :disabled="getDailyMissionStats()[index]"
-                >
-                  {{ getDailyMissionStats()[index] ? '已' : '' }}完成
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-            <v-list-item v-if="checkinItem">
-              <v-list-item-content>
-                <v-col cols="6">
-                  <item-avatar :item="checkinItem.id" :text="`× ${checkinItem.count}`"/>
-                </v-col>
-              </v-list-item-content>
-              <v-list-item-action>
-                <v-btn
-                  small
-                  @click="checkin(checkinItem)"
-                  :disabled="checkinStat"
-                >
-                  {{ checkinStat ? '已' : '' }}签到
-                </v-btn>
-              </v-list-item-action>
-            </v-list-item>
-          </v-list>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <reward-dialog
+      v-model="dailyDialog"
+      :rewards="dailyRewardsAndCheckin"
+      @rewardsGained="rewardsGained"
+    />
   </v-card>
 </template>
 
@@ -129,9 +91,10 @@
   import {currentDay} from '@/model/Utils';
   import {Moment} from 'moment-timezone/moment-timezone';
   import CheckinSupport from '@/components/mixins/CheckinSupport';
+  import RewardDialog, {RewardInfo} from '@/components/RewardDialog.vue';
 
   @Component({
-    components: {ItemAvatar, WarehouseList, NumberInput},
+    components: {RewardDialog, ItemAvatar, WarehouseList, NumberInput},
   })
   export default class Warehouse extends mixins(ItemSupport, WarehouseSupport, MissionSupport, CheckinSupport) {
     private creditShopDialog: boolean = false;
@@ -162,15 +125,43 @@
         .map((item) => item.itemId);
     }
 
-    private missionFinished(items: Array<CostItem>, index: number) {
-      items.forEach((item) => this.changeItem(item.id, item.count));
+    private get dailyRewardsAndCheckin(): Array<RewardInfo> {
+      const dailyRewardsInfo: Array<RewardInfo> = this.dailyRewards
+        .map((dailyReward, index) => {
+          return {
+            rewards: dailyReward,
+            finished: this.dailyMissionStats[index],
+            buttonText: '完成',
+            rewardKey: index,
+          };
+        });
+      if (this.checkinItem) {
+        dailyRewardsInfo.push({
+          rewards: [this.checkinItem],
+          finished: this.checkinStat,
+          buttonText: '签到',
+          rewardKey: 'checkin',
+        });
+      }
+      return dailyRewardsInfo;
+    }
+
+    private rewardsGained(key: number | string) {
+      if (key === 'checkin') {
+        this.checkin();
+      } else if (typeof key === 'number') {
+        this.missionFinished(key);
+      }
+    }
+
+    private missionFinished(index: number) {
       this.$store.commit(Mutations.DailyMissionFinished, {
         day: this.dailyDialogDay,
         index,
       });
     }
 
-    private getDailyMissionStats() {
+    private get dailyMissionStats() {
       return this.$store.getters[Getters.DailyMission](this.dailyDialogDay);
     }
 
@@ -196,8 +187,7 @@
       return this.$store.getters[Getters.Checkin](this.dailyDialogDay);
     }
 
-    private checkin(item: CostItem) {
-      this.changeItem(item.id, item.count);
+    private checkin() {
       this.$store.commit(Mutations.Checkin, this.dailyDialogDay);
     }
   }

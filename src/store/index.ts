@@ -299,9 +299,9 @@ const options: StoreOptions<ArknightsState> = {
       const dailyMission = state.missions.daily;
       const dayString = toDayString(payload.day);
       if (!dailyMission[dayString]) {
-        dailyMission[dayString] = [];
+        Vue.set(dailyMission, dayString, []);
       }
-      dailyMission[dayString][payload.index] = true;
+      Vue.set(dailyMission[dayString], payload.index, true);
     },
     [Mutations.Checkin]: (state: ArknightsState, day: Moment) => {
       Vue.set(state.checkin, toDayString(day), true);
