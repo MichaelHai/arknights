@@ -15,5 +15,5 @@ export function targetAchieved(agentData: CharacterData) {
 
 const devDayShift = 0;
 export function currentDay(): Moment {
-  return moment(new Date().getTime() - 4 * 60 * 60 * 1000 + devDayShift * 24 * 60 * 60 * 1000).tz('Asia/Shanghai');
+  return moment().subtract(4, 'hours').add(devDayShift, 'days').tz('Asia/Shanghai');
 }
