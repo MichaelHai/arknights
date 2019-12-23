@@ -16,6 +16,7 @@ export interface CharacterDetail {
   name: string;
   appellation: string;
   profession: Profession;
+  displayLogo: string;
   rarity: number;
   phases: Array<Phase>;
   skills: Array<Skill>;

@@ -1,10 +1,25 @@
 <template>
   <v-card elevation="0">
     <v-img
-      :src="characterBackground(characterId)"
-      class="black--text align-end"
+      :src="require('@/assets/characters/background.png')"
       height="200px"
+      class="black--text align-end"
     >
+      <v-img
+        v-if="characterLogo(character.displayLogo)"
+        :src="characterLogo(character.displayLogo)"
+        class="characterImage"
+        height="100px"
+        width="100px"
+        contain
+      />
+      <v-img
+        v-if="characterImage(characterId, characterData.phase === 2 ? 'phase2' : 'init')"
+        :src="characterImage(characterId, characterData.phase === 2 ? 'phase2' : 'init')"
+        height="200px"
+        contain
+        class="characterImage"
+      />
       <v-card-title>{{ character.name }}</v-card-title>
     </v-img>
 
@@ -313,5 +328,10 @@
 
   .targetPanel {
     padding: 0;
+  }
+
+  .characterImage {
+    position: absolute;
+    top: 0;
   }
 </style>

@@ -265,7 +265,7 @@
   .avatarCheck {
     font-size: 16px;
     margin-top: 12px;
-    margin-left: 20px;
+    margin-left: 24px;
   }
 
   .filterButton {

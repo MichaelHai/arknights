@@ -7,10 +7,12 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "update-master": ""
+    "crawler": "node src/asset-crawler.js"
   },
   "dependencies": {
     "core-js": "^3.4.3",
+    "crawler": "^1.2.1",
+    "fs": "0.0.1-security",
     "lodash": "^4.17.15",
     "moment-timezone": "^0.5.27",
     "vue": "^2.6.10",

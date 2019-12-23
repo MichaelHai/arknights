@@ -14,6 +14,24 @@ export default class ImageHelper extends mixins(SkillSupport) {
     }
   }
 
+  protected characterImage(characterId: string, skin: string = 'init'): string | null {
+    try {
+      return require(`@/assets/characters/${characterId}/${skin}.png`);
+    } catch (e) {
+      console.error(`${characterId}'s image not found`);
+      return null;
+    }
+  }
+
+  protected characterLogo(logo: string): string | null {
+    try {
+      return require(`@/assets/characters/logos/${logo}.png`);
+    } catch (e) {
+      console.error(`Logo ${logo} is not found`);
+      return null;
+    }
+  }
+
   protected skillIcon(skillId: string): string {
     try {
       return require(`@/assets/skills/${this.skillDetail(skillId).iconId || skillId}.png`);
@@ -28,7 +46,7 @@ export default class ImageHelper extends mixins(SkillSupport) {
       return require(`@/assets/characters/${characterId}/background.png`);
     } catch (e) {
       console.error(`${characterId}'s background not found`);
-      return require('@/assets/characters/fallback_background.png');
+      return require('@/assets/characters/background.png');
     }
   }
 
