@@ -13,6 +13,7 @@ export function targetAchieved(agentData: CharacterData) {
   return _.isEqual(current, agentData.planned);
 }
 
+const devDayShift = 0;
 export function currentDay(): Moment {
-  return moment(new Date().getTime() - 4 * 60 * 60 * 1000).tz('Asia/Shanghai');
+  return moment(new Date().getTime() - 4 * 60 * 60 * 1000 + devDayShift * 24 * 60 * 60 * 1000).tz('Asia/Shanghai');
 }

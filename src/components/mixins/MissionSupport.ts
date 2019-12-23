@@ -1,6 +1,6 @@
 import MissionTable from '@/assets/ArknightsGameData/excel/mission_table.json';
-import {Component, Vue} from 'vue-property-decorator';
-import {CostItem, ItemType} from '@/model';
+import {Component} from 'vue-property-decorator';
+import {CostItem} from '@/model';
 import {mixins} from 'vue-class-component';
 import ItemSupport from '@/components/mixins/ItemSupport';
 import {Moment} from 'moment-timezone/moment-timezone';
@@ -13,6 +13,10 @@ export default class MissionSupport extends mixins(ItemSupport) {
 
   private get periodicalRewards(): { [id: string]: PeriodicalRewards } {
     return MissionTable.periodicalRewards as { [id: string]: PeriodicalRewards };
+  }
+
+  private get weeklyRewards(): { [id: string]: WeeklyRewards } {
+    return MissionTable.weeklyRewards as { [id: string]: WeeklyRewards };
   }
 
   protected getDailyRewards(day: Moment): Array<Array<CostItem>> {
@@ -36,6 +40,15 @@ export default class MissionSupport extends mixins(ItemSupport) {
 
     return [];
   }
+
+  protected getWeeklyRewards(day: Moment): Array<Array<CostItem>> {
+    const epoch = day.toDate().getTime() / 1000;
+    return Object.values(this.weeklyRewards)
+      .filter((weeklyReward) => weeklyReward.beginTime <= epoch && weeklyReward.endTime >= epoch)
+      .sort((r1, r2) => r1.sortIndex - r2.sortIndex)
+      .map((reward) => reward.rewards.filter((r) => this.AllMaterials.indexOf(r.id) >= 0))
+      .filter((items) => items.length > 0);
+  }
 }
 
 export interface DailyMissionPeriodInfo {
@@ -53,6 +66,15 @@ export interface DailyMissionRewardPeriod {
 export interface PeriodicalRewards {
   groupId: string;
   id: string;
+  sortIndex: number;
+  rewards: Array<CostItem>;
+}
+
+export interface WeeklyRewards {
+  groupId: string;
+  id: string;
+  beginTime: number;
+  endTime: number;
   sortIndex: number;
   rewards: Array<CostItem>;
 }

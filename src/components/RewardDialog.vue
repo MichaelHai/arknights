@@ -1,7 +1,7 @@
 <template>
   <v-dialog scrollable v-model="shown">
     <v-card>
-      <v-card-title>日常</v-card-title>
+      <v-card-title>{{ title }}</v-card-title>
       <v-card-text>
         <v-list>
           <v-list-item v-for="rewardInfo in rewards" :key="rewardInfo.rewardKey">
@@ -51,6 +51,8 @@
 
     @Prop()
     public rewards!: Array<RewardInfo>;
+    @Prop()
+    public title!: string;
 
     public get shown(): boolean {
       return this.value;

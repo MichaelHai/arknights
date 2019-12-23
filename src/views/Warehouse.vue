@@ -33,6 +33,13 @@
       >
         <v-icon>mdi-calendar-today</v-icon>
       </v-btn>
+      <v-btn
+        fab
+        small
+        @click.prevent="openWeeklyMissionDialog"
+      >
+        <v-icon>mdi-calendar-week</v-icon>
+      </v-btn>
     </v-speed-dial>
 
     <v-dialog
@@ -71,8 +78,15 @@
 
     <reward-dialog
       v-model="dailyDialog"
+      title="日常 & 签到"
       :rewards="dailyRewardsAndCheckin"
       @rewardsGained="rewardsGained"
+    />
+    <reward-dialog
+      v-model="weeklyDialog"
+      title="周常"
+      :rewards="weeklyRewardsInfo"
+      @rewardsGained="weeklyRewardGained"
     />
   </v-card>
 </template>
@@ -116,6 +130,7 @@
     };
 
     private dailyDialog: boolean = false;
+    private weeklyDialog: boolean = false;
     private dailyDialogDay: Moment = currentDay();
 
     private get creditShopItems(): Array<string> {
@@ -123,6 +138,18 @@
         .map((item) => this.itemDetail(item))
         .sort((item1, item2) => item1.sortId - item2.sortId)
         .map((item) => item.itemId);
+    }
+
+    private get weeklyRewardsInfo(): Array<RewardInfo> {
+      return this.getWeeklyRewards(this.dailyDialogDay)
+        .map((weeklyReward, index) => {
+          return {
+            rewards: weeklyReward,
+            finished: this.weeklyMissionStats[index],
+            buttonText: '完成',
+            rewardKey: index,
+          };
+        });
     }
 
     private get dailyRewardsAndCheckin(): Array<RewardInfo> {
@@ -154,6 +181,15 @@
       }
     }
 
+    private weeklyRewardGained(key: number | string) {
+      if (typeof key === 'number') {
+        this.$store.commit(Mutations.WeeklyMissionFinished, {
+          day: this.dailyDialogDay,
+          index: key,
+        });
+      }
+    }
+
     private missionFinished(index: number) {
       this.$store.commit(Mutations.DailyMissionFinished, {
         day: this.dailyDialogDay,
@@ -165,6 +201,10 @@
       return this.$store.getters[Getters.DailyMission](this.dailyDialogDay);
     }
 
+    private get weeklyMissionStats() {
+      return this.$store.getters[Getters.WeeklyMission](this.dailyDialogDay);
+    }
+
     private get dailyRewards(): Array<Array<CostItem>> {
       return this.getDailyRewards(this.dailyDialogDay);
     }
@@ -172,6 +212,11 @@
     private openDailyMissionDialog() {
       this.dailyDialogDay = currentDay();
       this.dailyDialog = true;
+    }
+
+    private openWeeklyMissionDialog() {
+      this.dailyDialogDay = currentDay();
+      this.weeklyDialog = true;
     }
 
     private get checkinItem(): CostItem | null {

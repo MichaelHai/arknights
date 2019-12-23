@@ -28,6 +28,7 @@ export interface ArknightsState {
   homeCharacterId: string | null;
   missions: {
     daily: { [day: string]: Array<boolean> }
+    weekly: { [week: string]: Array<boolean> }
   };
   checkin: { [day: string]: boolean };
   uiControl: UIControl;
@@ -85,12 +86,14 @@ export enum Mutations {
   SetShowNontarget = 'SetShowNontarget',
   ToggleProfessionFilter = 'ToggleProfession',
   ToggleRarityFilter = 'ToggleRarityFilter',
+  WeeklyMissionFinished = 'WeeklyMissionFinished',
 }
 
 export enum Getters {
   CharacterData = 'AgentData',
   DailyMission = 'DailyMission',
   Checkin = 'Checkin',
+  WeeklyMission = 'WeeklyMission',
 }
 
 export interface ItemChangePayload {
@@ -118,7 +121,7 @@ export type AllSkillLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 export type PhaseLevel = 0 | 1 | 2;
 
-export interface DailyMissionFinishedPayload {
+export interface MissionFinishedPayload {
   index: number;
   day: Moment;
 }
@@ -207,6 +210,11 @@ function toDayString(day: Moment) {
   return `${day.year()}${day.month()}${day.date()}`;
 }
 
+function toWeekString(day: Moment) {
+  const clonedDay = day.clone();
+  return toDayString(clonedDay.weekday(1)); // monday as the first day of weekly mission
+}
+
 const options: StoreOptions<ArknightsState> = {
   state: {
     itemCounts: {},
@@ -214,6 +222,7 @@ const options: StoreOptions<ArknightsState> = {
     homeCharacterId: null,
     missions: {
       daily: {},
+      weekly: {},
     },
     checkin: {},
     uiControl: {
@@ -247,6 +256,9 @@ const options: StoreOptions<ArknightsState> = {
     },
     [Getters.Checkin]: (state) => (day: Moment) => {
       return state.checkin[toDayString(day)] || false;
+    },
+    [Getters.WeeklyMission]: (state) => (day: Moment) => {
+      return state.missions.weekly[toWeekString(day)] || [];
     },
   },
   mutations: {
@@ -295,7 +307,7 @@ const options: StoreOptions<ArknightsState> = {
       Vue.set(agentData.planned.skillLevel, payload.skillId, ensureSkillLevel(payload.targetSkillLevel));
       ensurePlannedSkillLevel(agentData, payload.skillId);
     },
-    [Mutations.DailyMissionFinished]: (state: ArknightsState, payload: DailyMissionFinishedPayload) => {
+    [Mutations.DailyMissionFinished]: (state: ArknightsState, payload: MissionFinishedPayload) => {
       const dailyMission = state.missions.daily;
       const dayString = toDayString(payload.day);
       if (!dailyMission[dayString]) {
@@ -355,6 +367,14 @@ const options: StoreOptions<ArknightsState> = {
           }
         }
       }
+    },
+    [Mutations.WeeklyMissionFinished]: (state: ArknightsState, payload: MissionFinishedPayload) => {
+      const weeklyMission = state.missions.weekly;
+      const weekString = toWeekString(payload.day);
+      if (!weeklyMission[weekString]) {
+        Vue.set(weeklyMission, weekString, []);
+      }
+      Vue.set(weeklyMission[weekString], payload.index, true);
     },
   },
   actions: {},
