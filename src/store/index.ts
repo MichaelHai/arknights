@@ -238,7 +238,7 @@ const options: StoreOptions<ArknightsState> = {
         nameFilter: '',
         professionExcluded: {},
         rarityExcluded: [],
-        showNontarget: false,
+        showNontarget: true,
       },
     },
   },
