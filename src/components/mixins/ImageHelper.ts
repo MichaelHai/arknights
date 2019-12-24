@@ -10,7 +10,7 @@ export default class ImageHelper extends mixins(SkillSupport) {
       return require(`@/assets/characters/${characterId}/avatar.png`);
     } catch (e) {
       console.error(`${characterId}'s avatar not found`);
-      return require('@/assets/characters/fallback_avatar.png');
+      return require('@/assets/items/fallback_icon.png');
     }
   }
 
