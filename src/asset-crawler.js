@@ -88,7 +88,7 @@ function crawlIfNotExist(uri, filename) {
       });
     }
   } else {
-    throw new Error(`no uri specified for ${filename}`);
+    console.error(`no uri specified for ${filename}`);
   }
 }
 
