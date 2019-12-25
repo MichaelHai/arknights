@@ -159,7 +159,7 @@
         } else {
           const countAdded = this.addToMap(item, compositeItemsMap);
           const compositeItems: Array<CostItem> = this.getCompositeItems(itemId);
-          for (let i = 0; i < countAdded; i++) {
+          for (let i = 0; i < Math.ceil(countAdded / this.getProduceCount(itemId)); i++) {
             unprocessedItems.push(...compositeItems);
           }
         }

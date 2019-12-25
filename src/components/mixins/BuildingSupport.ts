@@ -23,5 +23,6 @@ export default class BuildingSupport extends Vue {
 export interface BuildingFormula {
   formulaId: string;
   itemId: string;
+  count: number;
   costs: Array<CostItem>;
 }

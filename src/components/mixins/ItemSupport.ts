@@ -49,6 +49,15 @@ export default class ItemSupport extends mixins(BuildingSupport) {
       return [];
     }
   }
+
+  protected getProduceCount(id: string): number {
+    const buildingProduct: Array<ItemBuildingProduct> = this.itemDetail(id).buildingProductList;
+    if (buildingProduct.length > 0) {
+      return this.getBuildingFormulas(buildingProduct[0].formulaId, buildingProduct[0].roomType).count;
+    } else {
+      return 0;
+    }
+  }
 }
 
 export type ItemSuggestion = 'composite' | Array<string>;

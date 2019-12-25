@@ -48,6 +48,10 @@ export interface UIControl {
     professionExcluded: { [profession: string]: boolean };
     rarityExcluded: Array<boolean>;
     showNontarget: boolean;
+  },
+  compositeBonus: {
+    snackbar: boolean;
+    items: Array<string>;
   }
 }
 
@@ -87,6 +91,8 @@ export enum Mutations {
   ToggleProfessionFilter = 'ToggleProfession',
   ToggleRarityFilter = 'ToggleRarityFilter',
   WeeklyMissionFinished = 'WeeklyMissionFinished',
+  ShowCompositeBonusSnackbar = 'ShowCompositeBonusSnackbar',
+  HideCompositeBonusSnackbar = 'HideCompositeBonusSnackbar',
 }
 
 export enum Getters {
@@ -240,6 +246,10 @@ const options: StoreOptions<ArknightsState> = {
         rarityExcluded: [],
         showNontarget: true,
       },
+      compositeBonus: {
+        snackbar: false,
+        items: [],
+      },
     },
   },
   getters: {
@@ -375,6 +385,13 @@ const options: StoreOptions<ArknightsState> = {
         Vue.set(weeklyMission, weekString, []);
       }
       Vue.set(weeklyMission[weekString], payload.index, true);
+    },
+    [Mutations.ShowCompositeBonusSnackbar]: (state: ArknightsState, items: Array<string>) => {
+      state.uiControl.compositeBonus.snackbar = true;
+      state.uiControl.compositeBonus.items = items;
+    },
+    [Mutations.HideCompositeBonusSnackbar]: (state: ArknightsState) => {
+      state.uiControl.compositeBonus.snackbar = false;
     },
   },
   actions: {},

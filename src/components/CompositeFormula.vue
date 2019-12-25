@@ -26,27 +26,12 @@
       <v-btn v-if="count > 1" small tile class="ma-1" @click="compositeAll">全部</v-btn>
     </v-col>
 
-    <v-dialog
-      v-model="compositeBonusDialog"
-      scrollable
-    >
-      <v-card>
-        <v-card-title>副产品</v-card-title>
-        <v-card-text>
-          <warehouse-list :items="compositeBonusItems"/>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
     <v-snackbar v-model="snackbar" :timeout="3000">{{ snackbarMessage }}</v-snackbar>
-    <v-snackbar v-model="compositeSnackbar" :timeout="3000">
-      材料已合成!
-      <v-btn @click.prevent="compositeBonusDialog = true" small text color="success">额外掉落</v-btn>
-    </v-snackbar>
   </v-row>
 </template>
 
 <script lang="ts">
-  import {Component, Emit, Prop, Watch} from 'vue-property-decorator';
+  import {Component, Prop} from 'vue-property-decorator';
   import {mixins} from 'vue-class-component';
   import ItemSupport from '@/components/mixins/ItemSupport';
   import {CostItem} from '@/model';
@@ -67,8 +52,6 @@
     public count: number | undefined;
 
     private compositeSnackbar: boolean = false;
-    private compositeBonusDialog: boolean = false;
-    private compositeBonusItems: Array<string> = [];
     private snackbar: boolean = false;
     private snackbarMessage: string = '';
 
@@ -76,7 +59,7 @@
       const warehouseAmount = this.warehouseAmount(compositeItem.id);
       return {
         'red--text': compositeItem.count > warehouseAmount,
-        'green--text': compositeItem.count * itemCount <= warehouseAmount,
+        'green--text': compositeItem.count * Math.ceil(itemCount / this.produceCount) <= warehouseAmount,
       };
     }
 
@@ -86,8 +69,12 @@
 
     private compositeAll() {
       if (this.count && this.count > 0) {
-        this.composite(this.item, this.count);
+        this.composite(this.item, Math.ceil(this.count / this.produceCount));
       }
+    }
+
+    private get produceCount(): number {
+      return this.getProduceCount(this.item);
     }
 
     private composite(item: string, count: number) {
@@ -101,13 +88,19 @@
         this.snackbar = true;
         return;
       }
-      this.$store.commit(Mutations.ChangeItem, {item: costItem.id, amount: costItem.count});
+      this.$store.commit(Mutations.ChangeItem, {
+        item: costItem.id,
+        amount: costItem.count * this.getProduceCount(costItem.id),
+      });
       this.getCompositeItems(costItem.id).forEach((toComposite) => {
         this.$store.commit(Mutations.ChangeItem, {item: toComposite.id, amount: -costItem.count * toComposite.count});
       });
 
       this.compositeSnackbar = true;
-      this.compositeBonusItems = this.AllMaterials.filter((material) => this.itemDetail(material).rarity === this.itemDetail(costItem.id).rarity - 1);
+      this.$store.commit(
+        Mutations.ShowCompositeBonusSnackbar,
+        this.AllMaterials.filter((material) => this.itemDetail(material).rarity === this.itemDetail(costItem.id).rarity - 1)
+      );
     }
 
     private checkComposite(item: CostItem): boolean {

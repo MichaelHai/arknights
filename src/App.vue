@@ -31,6 +31,7 @@
     </v-bottom-navigation>
     <item-dialog/>
     <loot-dialog/>
+    <composite-bonus/>
   </v-app>
 </template>
 
@@ -38,8 +39,9 @@
   import {Component, Vue} from 'vue-property-decorator';
   import ItemDialog from '@/components/ItemDialog.vue';
   import LootDialog from '@/components/LootDialog.vue';
+  import CompositeBonus from '@/components/CompositeBonus.vue';
   @Component({
-    components: {LootDialog, ItemDialog},
+    components: {CompositeBonus, LootDialog, ItemDialog},
   })
   export default class App extends Vue {
   }
