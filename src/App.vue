@@ -32,6 +32,7 @@
     <item-dialog/>
     <loot-dialog/>
     <composite-bonus/>
+    <update-notification/>
   </v-app>
 </template>
 
@@ -40,8 +41,10 @@
   import ItemDialog from '@/components/ItemDialog.vue';
   import LootDialog from '@/components/LootDialog.vue';
   import CompositeBonus from '@/components/CompositeBonus.vue';
+  import UpdateNotification from '@/components/UpdateNotification.vue';
+
   @Component({
-    components: {CompositeBonus, LootDialog, ItemDialog},
+    components: {UpdateNotification, CompositeBonus, LootDialog, ItemDialog},
   })
   export default class App extends Vue {
   }
