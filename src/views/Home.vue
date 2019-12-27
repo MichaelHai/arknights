@@ -15,7 +15,7 @@
       <v-subheader>
         干员页面点击
         <v-icon color="grey lighten-1"> mdi-home</v-icon>
-        将干员添加到首页
+        将干员添加到首页.
       </v-subheader>
       <v-subheader>
         感谢素材和数据来源：
