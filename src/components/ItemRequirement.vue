@@ -5,7 +5,7 @@
     </v-col>
     <v-col cols="7" class="itemCount ma-auto">
       <v-row dense class="itemName">{{ itemDetail(item.id).name }}</v-row>
-      <v-row dense>{{ warehouseAmount(item.id) }}/{{item.count}}</v-row>
+      <v-row dense>{{item.count}}/{{ warehouseAmount(item.id) }}</v-row>
     </v-col>
   </v-row>
 </template>
