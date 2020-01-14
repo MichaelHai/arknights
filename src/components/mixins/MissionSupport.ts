@@ -1,4 +1,4 @@
-import MissionTable from '@/assets/ArknightsGameData/excel/mission_table.json';
+import MissionTable from '@/assets/ArknightsGameData/zh_CN/gamedata/excel/mission_table.json';
 import {Component} from 'vue-property-decorator';
 import {CostItem} from '@/model';
 import {mixins} from 'vue-class-component';

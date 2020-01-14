@@ -1,7 +1,7 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {CostItem, ItemType} from '@/model';
 import {Moment} from 'moment-timezone/moment-timezone';
-import CheckinTable from '@/assets/ArknightsGameData/excel/checkin_table.json';
+import CheckinTable from '@/assets/ArknightsGameData/zh_CN/gamedata/excel/checkin_table.json';
 
 @Component
 export default class CheckinSupport extends Vue {

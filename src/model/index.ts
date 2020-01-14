@@ -1,6 +1,6 @@
 import {AllSkillLevel, PhaseLevel, SkillLevel} from '@/store';
-import CharacterTable from '@/assets/ArknightsGameData/excel/character_table.json';
-import SkillTable from '@/assets/ArknightsGameData/excel/skill_table.json';
+import CharacterTable from '@/assets/ArknightsGameData/zh_CN/gamedata/excel/character_table.json';
+import SkillTable from '@/assets/ArknightsGameData/zh_CN/gamedata/excel/skill_table.json';
 
 export interface SkillDetail {
   skillId: string;

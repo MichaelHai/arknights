@@ -1,5 +1,5 @@
 import {Component} from 'vue-property-decorator';
-import StageTable from '@/assets/ArknightsGameData/excel/stage_table.json';
+import StageTable from '@/assets/ArknightsGameData/zh_CN/gamedata/excel/stage_table.json';
 import {mixins} from 'vue-class-component';
 import ItemSupport from '@/components/mixins/ItemSupport';
 

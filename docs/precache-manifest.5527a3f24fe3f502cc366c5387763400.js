@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "71479679a1672e3fcc9d",
+    "revision": "a4b15ee18c2e23b72c4b",
     "url": "/css/app.37725c2a.css"
   },
   {
@@ -620,6 +620,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/avatar.b9cfccd3.png"
   },
   {
+    "revision": "bc07317c2e0e04598af794ce67fb8987",
+    "url": "/img/avatar.bc07317c.png"
+  },
+  {
     "revision": "c3b46b9c8ade6bef09230cf3f8ef8a76",
     "url": "/img/avatar.c3b46b9c.png"
   },
@@ -978,6 +982,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "83f520dbe93185746d493b465b3c33ac",
     "url": "/img/init.83f520db.png"
+  },
+  {
+    "revision": "8457a6860481f2f8b7d2efb2acc8cad2",
+    "url": "/img/init.8457a686.png"
   },
   {
     "revision": "845dfec8397f0510997158fbbee9c2ae",
@@ -1598,6 +1606,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "d6c0cce3ced5268783585952e9e03deb",
     "url": "/img/phase2.d6c0cce3.png"
+  },
+  {
+    "revision": "de804a1f46660cf03adaa4dbaa191ae4",
+    "url": "/img/phase2.de804a1f.png"
   },
   {
     "revision": "e2eec2cf17d4b6a99a921edb4e2081d3",
@@ -2236,6 +2248,14 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/skchr_snakek_2.440600c4.png"
   },
   {
+    "revision": "e873d968c97312a33ca1f609c66c98ef",
+    "url": "/img/skchr_snsant_1.e873d968.png"
+  },
+  {
+    "revision": "961052033a9eac9a5bada406ec650f8e",
+    "url": "/img/skchr_snsant_2.96105203.png"
+  },
+  {
     "revision": "363c54636e12c53b8e5ac78c6ee9f1fb",
     "url": "/img/skchr_sora_1.363c5463.png"
   },
@@ -2420,12 +2440,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/img/skcom_range_extend.e874debf.png"
   },
   {
-    "revision": "91b9575d4ce4910caac11a51e1aa5272",
+    "revision": "ddbd4fe66945df87f0f77d7a340c5f91",
     "url": "/index.html"
   },
   {
-    "revision": "71479679a1672e3fcc9d",
-    "url": "/js/app.02ebbbea.js"
+    "revision": "a4b15ee18c2e23b72c4b",
+    "url": "/js/app.bfeed83c.js"
   },
   {
     "revision": "7241f5b6bc30920932ae",

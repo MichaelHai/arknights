@@ -1,6 +1,6 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {CostItem, RoomType} from '@/model';
-import BuildingData from '@/assets/ArknightsGameData/excel/building_data.json';
+import BuildingData from '@/assets/ArknightsGameData/zh_CN/gamedata/excel/building_data.json';
 
 @Component
 export default class BuildingSupport extends Vue {

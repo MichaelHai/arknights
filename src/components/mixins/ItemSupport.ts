@@ -3,7 +3,7 @@ import {CostItem, ItemBuildingProduct, ItemClassifyType, ItemDetail, ItemType} f
 import MasterData from '@/assets/master-data.json';
 import {mixins} from 'vue-class-component';
 import BuildingSupport from '@/components/mixins/BuildingSupport';
-import ItemTable from '@/assets/ArknightsGameData/excel/item_table.json';
+import ItemTable from '@/assets/ArknightsGameData/zh_CN/gamedata/excel/item_table.json';
 
 @Component
 export default class ItemSupport extends mixins(BuildingSupport) {

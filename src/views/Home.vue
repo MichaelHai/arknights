@@ -26,7 +26,7 @@
             <a href="https://bbs.nga.cn/read.php?tid=19069337" target="_blank">NGA@根派</a>
           </li>
           <li>
-            <a href="https://github.com/Perfare/ArknightsGameData" target="_blank">Perfare/ArknightsGameData</a>
+            <a href="https://github.com/Kengxxiao/ArknightsGameData" target="_blank">Kengxxiao/ArknightsGameData</a>
           </li>
           <li>
             <a href="http://ak.mooncell.wiki/w/%E9%A6%96%E9%A1%B5" target="_blank">PRTS Wiki</a>
