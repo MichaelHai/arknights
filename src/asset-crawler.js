@@ -56,7 +56,8 @@ var characterCrawler = new Crawler({
       function crawlImage(selector, name) {
         var $logo = $(selector)[0];
         if ($logo) {
-          var logoUrl = `http:${$logo.attribs['src']}`;
+          var url = $logo.attribs['src'];
+          var logoUrl = url.startsWith('http') ? url : `http:${url}`;
           crawlIfNotExist(logoUrl, `./src/assets/characters/${name}.png`);
         } else {
           console.error('error crawling logo for ' + characters[id].name);
