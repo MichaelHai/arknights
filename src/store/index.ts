@@ -93,6 +93,7 @@ export enum Mutations {
   WeeklyMissionFinished = 'WeeklyMissionFinished',
   ShowCompositeBonusSnackbar = 'ShowCompositeBonusSnackbar',
   HideCompositeBonusSnackbar = 'HideCompositeBonusSnackbar',
+  Import = 'Import',
 }
 
 export enum Getters {
@@ -100,6 +101,7 @@ export enum Getters {
   DailyMission = 'DailyMission',
   Checkin = 'Checkin',
   WeeklyMission = 'WeeklyMission',
+  ExportData = 'ExportData',
 }
 
 export interface ItemChangePayload {
@@ -270,6 +272,9 @@ const options: StoreOptions<ArknightsState> = {
     [Getters.WeeklyMission]: (state) => (day: Moment) => {
       return state.missions.weekly[toWeekString(day)] || [];
     },
+    [Getters.ExportData]: (state) => () => {
+      return vuexPersist.reducer(state);
+    },
   },
   mutations: {
     [Mutations.ChangeItem]: (state: ArknightsState, payload: ItemChangePayload) => {
@@ -392,6 +397,14 @@ const options: StoreOptions<ArknightsState> = {
     },
     [Mutations.HideCompositeBonusSnackbar]: (state: ArknightsState) => {
       state.uiControl.compositeBonus.snackbar = false;
+    },
+    [Mutations.Import]: (state: ArknightsState, data: any) => {
+      state.characterData = data.characterData;
+      state.checkin = data.checkin;
+      state.homeCharacterId = data.homeCharacterId;
+      state.itemCounts = data.itemCounts;
+      state.missions = data.missions;
+      state.uiControl.characterFilter = data.uiControl.characterFilter;
     },
   },
   actions: {},
