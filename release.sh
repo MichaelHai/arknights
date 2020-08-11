@@ -1,3 +1,4 @@
+npm run crawler
 npm run build
 rm -r ./docs/css
 rm -r ./docs/img
