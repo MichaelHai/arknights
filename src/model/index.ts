@@ -20,7 +20,8 @@ export interface CharacterDetail {
   rarity: number;
   phases: Array<Phase>;
   skills: Array<Skill>;
-  allSkillLvlup: Array<AllSkillLevelUpCostCond>
+  allSkillLvlup: Array<AllSkillLevelUpCostCond>;
+  displayNumber: string | null;
 }
 
 export enum ItemClassifyType {

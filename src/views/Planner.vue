@@ -196,6 +196,7 @@
       return Object.keys(Characters)
         .filter((c) => Characters[c].profession !== Profession.TOKEN)
         .filter((c) => Characters[c].profession !== Profession.TRAP)
+        .filter((c) => Characters[c].displayNumber !== null)
         .filter((c) => !this.professionExcluded[Characters[c].profession])
         .filter((c) => !this.rarityExcluded[Characters[c].rarity])
         .filter((c) => Characters[c].name.includes(this.nameFilter) || Characters[c].appellation.includes(this.nameFilter))

@@ -2,6 +2,8 @@ var Crawler = require('crawler');
 var characters = require('./assets/ArknightsGameData/zh_CN/gamedata/excel/character_table');
 var fs = require('fs');
 
+var host = 'http://prts.wiki';
+
 var imageCrawler = new Crawler({
   maxConnections: 10,
   encoding: null,
@@ -57,8 +59,10 @@ var characterCrawler = new Crawler({
         var $logo = $(selector)[0];
         if ($logo) {
           var url = $logo.attribs['src'];
-          var logoUrl = url.startsWith('http') ? url : `http:${url}`;
-          crawlIfNotExist(logoUrl, `./src/assets/characters/${name}.png`);
+          if (url && url !== '') {
+            var logoUrl = url.startsWith('http') ? url : `http:${url}`;
+            crawlIfNotExist(logoUrl, `./src/assets/characters/${name}.png`);
+          }
         } else {
           console.error('error crawling logo for ' + characters[id].name);
         }
@@ -73,7 +77,7 @@ var characterCrawler = new Crawler({
       var skillImages = $('.nomobile img[alt^="技能"]');
       characters[id].skills.forEach((skill, index) => {
         if (skillImages[index]) {
-          crawlIfNotExist(`http://ak.mooncell.wiki${skillImages[index].attribs['data-src']}`, `./src/assets/skills/${skill.skillId}.png`);
+          crawlIfNotExist(`${host}${skillImages[index].attribs['data-src']}`, `./src/assets/skills/${skill.skillId}.png`);
         } else {
           console.error(`Skill image not found for ${id}: ${skill.skillId}`);
         }
@@ -117,9 +121,10 @@ var avatarInfoCrawler = new Crawler({
     Object.keys(characters)
       .filter((c) => characters[c].profession !== 'TOKEN')
       .filter((c) => characters[c].profession !== 'TRAP')
+      .filter((c) => characters[c].displayNumber !== null)
       .forEach((id) => {
         characterCrawler.queue({
-          uri: encodeURI(`http://ak.mooncell.wiki/w/${characters[id].name}`),
+          uri: encodeURI(`${host}/w/${characters[id].name}`),
           id: id,
           avatarUri: avatar[characters[id].name],
         });
@@ -129,5 +134,5 @@ var avatarInfoCrawler = new Crawler({
 });
 
 avatarInfoCrawler.queue({
-  uri: encodeURI('http://ak.mooncell.wiki/w/干员一览'),
+  uri: encodeURI(`${host}/w/干员一览`),
 });
