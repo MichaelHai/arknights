@@ -1,3 +1,4 @@
+git submodule update --remote
 npm run crawler
 npm run build
 rm -r ./docs/css

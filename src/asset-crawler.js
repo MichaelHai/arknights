@@ -114,7 +114,8 @@ var avatarInfoCrawler = new Crawler({
       var datas = $('.smwdata');
       for (var i = 0; i < datas.length; i++) {
         var $data = datas[i];
-        avatar[$data.attribs['data-cn']] = `http:${$data.attribs['data-icon']}`;
+        var url = $data.attribs['data-icon'];
+        avatar[$data.attribs['data-cn']] = url.startsWith('http') ? url : `http:${url}`;
       }
     }
 
