@@ -68,7 +68,8 @@ var characterCrawler = new Crawler({
         }
       }
 
-      crawlImage('#deflogo img', `logos/${characters[id].displayLogo}`);
+      const logoName = characters[id].teamId || characters[id].groupId || characters[id].nationId;
+      crawlImage('#deflogo img', `logos/${logoName}`);
       crawlImage('#img-stage0 img', `${id}/init`);
       if (characters[id].phases.length > 2) {
         crawlImage('#img-stage2 img', `${id}/phase2`);

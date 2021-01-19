@@ -1,5 +1,5 @@
 import {Component, Vue} from 'vue-property-decorator';
-import {Skills} from '@/model';
+import {CharacterDetail, Skills} from '@/model';
 import {mixins} from 'vue-class-component';
 import SkillSupport from '@/components/mixins/SkillSupport';
 
@@ -23,7 +23,8 @@ export default class ImageHelper extends mixins(SkillSupport) {
     }
   }
 
-  protected characterLogo(logo: string): string | null {
+  protected characterLogo(character: CharacterDetail): string | null {
+    const logo = character.teamId || character.groupId || character.nationId;
     try {
       return require(`@/assets/characters/logos/${logo}.png`);
     } catch (e) {

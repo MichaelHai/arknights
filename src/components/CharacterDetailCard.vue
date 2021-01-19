@@ -6,8 +6,8 @@
       class="black--text align-end"
     >
       <v-img
-        v-if="characterLogo(character.displayLogo)"
-        :src="characterLogo(character.displayLogo)"
+        v-if="characterLogo(character)"
+        :src="characterLogo(character)"
         class="characterImage"
         height="100px"
         width="100px"
